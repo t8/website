@@ -36,7 +36,7 @@ export default class Author {
       this._name = author.name || this._address;
       const $svg = $(jdenticon.toSvg(name, 32));
       const s = new XMLSerializer().serializeToString($svg[0]);
-      this._avatar = `data:image/svg+xml;base64,${window.btoa(s)}`;
+      this._avatar = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(s)))}`;
     }
 
     return {
