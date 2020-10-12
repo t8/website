@@ -247,6 +247,17 @@ class App {
         $target.val(99);
       }
     });
+
+    $(document).on('input', '.input-float', (e: any) => {
+      const $target = $(e.target);
+      const newVal = +$target.val().toString().replace(/[^0-9\.]/g, '');
+      $target.val(newVal);
+  
+      // Needed?
+      if($target.hasClass('percent') && newVal >= 100) {
+        $target.val(100);
+      }
+    });
   }
 }
 

@@ -2,14 +2,13 @@ import $ from '../libs/jquery';
 import Utils from '../utils/utils';
 import Toast from '../utils/toast';
 import app from '../app';
+import arweave from "../libs/arweave";
 import Vote from '../models/vote';
 import { VoteType, VoteInterface } from 'community-js/lib/faces';
 
 export default class PageVotes {
   private votes: Vote[] = [];
   private firstCall: boolean = true;
-
-  constructor() {}
 
   async open() {
     $('.link-votes').addClass('active');
@@ -88,12 +87,38 @@ export default class PageVotes {
     }
   }
 
-  private async setValidate() {
+  private showLogo(hash) {
+    $('#vote-set-value').removeClass('is-invalid');
+    // $('#vote-set-value-logo-preview').attr('src', "https://arweave.net/" + hash);
+    // $('#vote-set-value-logo-preview').show();
+  }
+
+  private setLogoInvalid() {
+    $('#vote-set-value').addClass('is-invalid');
+    // $('#vote-set-value-logo-preview').hide();
+  }
+
+  private async setValueValidate() {
     const state = await app.getCommunity().getState();
 
     const recipient = $('#vote-recipient').val().toString().trim();
     const setKey = $('#vote-set-key').val();
     let setValue: string | number = $('#vote-set-value').val().toString().trim();
+
+    if($('.url:visible').length) {
+      let urlsValid = true;
+      $('.url:visible').each(function() {
+        try {
+          const url: string = $(this).val().toString().trim();
+          new URL(url);
+          $(this).removeClass('is-invalid');
+        } catch(_) {
+          $(this).addClass('is-invalid');
+          urlsValid = false;
+        }
+      });
+      return urlsValid;
+    }
 
     if(setKey === 'quorum' || setKey === 'support') {
       setValue = +setValue;
@@ -135,12 +160,88 @@ export default class PageVotes {
         $('#vote-set-value').addClass('is-invalid');
         return false;
       }
+    } else if(setKey === 'communityLogo') {
+      this.setLogoInvalid(); // not yet validated
+      let setValue: string = $('#vote-set-value').val().toString().trim();
+      if(setValue === "") { // TODO: more wide condition
+        this.setLogoInvalid(); // don't query the network in this case
+      } else {
+        arweave.transactions.getStatus(setValue).then(status => {
+          if(status.status === 200) {
+            this.showLogo(setValue);
+          } else {
+            this.setLogoInvalid();
+          }
+        });
+      }
     } else {
-      return false;
+      $('.lock-set-value-invalid').text('');
     }
 
-    $('#vote-set-value').removeClass('is-invalid');
+    if($('#vote-set-key').val() !== 'communityLogo') { // communityLogo is validated "dynamically", see above.
+      $('#vote-set-value').removeClass('is-invalid');
+    }
     return true;
+  }
+
+  private async setNameValidate() {
+    if($('#vote-set-key').val() !== 'other') {
+      return true; // no need to validate the key
+    }
+    if($('#vote-set-name').val() === '') {
+      $('#vote-set-name').addClass('is-invalid');
+      return false;
+    } else {
+      $('#vote-set-name').removeClass('is-invalid');
+    }
+    return true;
+  }
+
+  private async setValidate() {
+    let valid = true;
+    if(!await this.setValueValidate()) {
+      valid = false;
+    }
+    if(!await this.setNameValidate()) {
+      valid = false;
+    }
+    return valid;
+  }
+
+  // Change the input fields after input
+  private modifyVotes() {
+    $('#vote-logo-upload').on('change', e0 => {
+      const fileReader = new FileReader();
+      fileReader.onload = async e => {
+        const contentType = (e0.target as any).files[0].type;
+        // For old browsers accept="..." does not work, so check here:
+        if(['image/png', 'image/jpeg', 'image/webp'].indexOf(contentType) == -1) {
+          alert("Must be an image.");
+          return;
+        }
+        const fileContent = e.target.result as ArrayBuffer;
+
+        const { transaction, response } = await app.getCommunity().uploadFile(fileContent, contentType);
+        if(response.status != 200) {
+            alert("Failed ArWeave transaction.");
+            return;
+        }
+        $('#vote-set-value').val(transaction.id);
+        this.showLogo(transaction.id)
+      };
+      fileReader.readAsArrayBuffer((e0.target as any).files[0]);
+    });
+
+    // Disallow spaces
+    $('#vote-set-name').on('input', e => {
+      let setName: string = $('#vote-set-name').val().toString().replace(' ', '-');
+      $('#vote-set-name').val(setName);
+    });
+  }
+
+  private removeModifyVotes() {
+    $('#vote-set-name').off('input');
+    $('#vote-logo-upload').off('change');
   }
 
   async validateVotes() {
@@ -167,25 +268,107 @@ export default class PageVotes {
       }
     }).trigger('change');
 
-    $('#vote-set-key').on('change', e => {
+    function updateOtherIsNumber() {
+      if($('#vote-set-value-is-number').is(':checked')) {
+        $('#vote-set-value').addClass('input-float');
+        $('#vote-set-value').trigger('input');
+      } else {
+        $('#vote-set-value').removeClass('input-float');
+      }
+    }
+
+    $('#vote-set-key').on('change', async e => {
       const setKey = $(e.target).val();
       const $target = $('#vote-set-value').val('');
 
       $('.vote-recipient').hide();
+      $('.vote-set-name').hide();
+      $('#vote-set-value-is-number-label').hide();
+      if(setKey !== 'description') {
+        $('#vote-set-value2').hide();
+      }
+      if(setKey !== 'discussionLinks') {
+        $('#vote-set-value').show();
+        $('#vote-set-value-links-container').hide();
+      }
+      if(setKey !== 'communityLogo') {
+        // $('#vote-set-value-logo-preview').hide();
+        $('#vote-logo-upload').hide();
+      }
+      $('#vote-set-value').removeClass('input-number input-float percent url');
       switch(setKey) {
         case 'role':
           $('.vote-recipient').show();
-          $target.removeClass('input-number percent');
           break;
         case 'lockMinLength':
         case 'lockMaxLength':
-          $target.addClass('input-number').removeClass('percent');
+          $target.addClass('input-number');
           break;
         case 'quorum':
         case 'support':
           $target.addClass('input-number percent');
           break;
+        case 'description':
+          $('#vote-set-value').hide();
+          $('#vote-set-value2').show();
+          break;
+        case 'appUrl':
+          $target.addClass('url');
+          break;
+        case 'communityLogo':
+          $('#vote-logo-upload').show();
+          $target.trigger('input');
+          break;
+        case 'discussionLinks':
+          $('#vote-set-value').hide();
+          $('#vote-set-value-links-container').show();
+          break;
+        case 'other':
+          updateOtherIsNumber();
+          $('.vote-set-name').show();
+          $('#vote-set-value-is-number-label').show();
+          break;
       }
+
+      await this.setValidate();
+    });
+
+    $('#vote-set-value-is-number').on('click', e => {
+      updateOtherIsNumber();
+    });
+
+    function updateUpDownArrows() {
+      // Now we have only one table with arrows, so it's efficient enough. If we add more tables, probably should restrict to one table at a time.
+      $('.move-up-tr').each(function () {
+        $(this).css('visibility', $(this).closest('tr').is(':nth-child(2)') ? 'hidden' : 'visible');
+      });
+      $('.move-down-tr').each(function () {
+        $(this).css('visibility', $(this).closest('tr').is(':last-child') ? 'hidden' : 'visible');
+      });
+    }
+
+    $('.delete-tr').on('click', e => {
+      $(e.target).closest('tr').remove();
+      updateUpDownArrows();
+    });
+
+    $('.move-up-tr').on('click', e => {
+      const row = $(e.target).closest('tr');
+      row.prev().before(row);
+      updateUpDownArrows();
+    });
+
+    $('.move-down-tr').on('click', e => {
+      const row = $(e.target).closest('tr');
+      row.next().after(row);
+      updateUpDownArrows();
+    });
+
+    $('#vote-set-value-links-add').on('click', e => {
+      const copy = $('#vote-set-value-links-template').clone(true);
+      copy.css('display', 'block');
+      $('#vote-set-value-links-template').parent().append(copy);
+      updateUpDownArrows();
     });
 
     $('#vote-recipient, #vote-target').on('input', async e => {
@@ -206,7 +389,15 @@ export default class PageVotes {
     });
 
     $('#vote-set-value').on('input', async e => {
-      await this.setValidate();
+      await this.setValueValidate();
+    });
+
+    $('.value-url').on('input', async e => {
+      await this.setValueValidate();
+    });
+
+    $('#vote-set-name').on('input', async e => {
+      await this.setNameValidate();
     });
 
     $('#vote-qty').on('input', async e => {
@@ -261,7 +452,18 @@ export default class PageVotes {
       const length = +$('#vote-lock-length').val().toString().trim();
       const target = $('#vote-target').val().toString().trim();
       const setKey = $('#vote-set-key').val();
-      let setValue = $('#vote-set-value').val().toString().trim();
+      let setValue : string | number | string[];
+      if(setKey === 'discussionLinks') {
+        const rows = $('#vote-set-value-links-template').nextAll();
+        setValue = rows.find('input[type=text]').map(function() { return $(this).val().toString(); }).get();
+      } else if($('#vote-set-value2').css('display') !== 'none') {
+        setValue = $('#vote-set-value2').val().toString().trim();
+      } else {
+        setValue = $('#vote-set-value').val().toString().trim();
+      }
+      if(setKey === 'other' && $('#vote-set-value-is-number').is(':checked')) {
+        setValue = Number(setValue);
+      }
       const note = $('#vote-note').val().toString().trim();
 
       let voteParams: VoteInterface = {
@@ -302,7 +504,7 @@ export default class PageVotes {
         }
         
         // @ts-ignore
-        voteParams['key'] = setKey;
+        voteParams['key'] = setKey === 'other' ? $('#vote-set-name').val().toString() : setKey;
         voteParams['value'] = setValue;
       }
 
@@ -345,9 +547,11 @@ export default class PageVotes {
   }
 
   private async events() {
+    await this.modifyVotes();
     await this.validateVotes();
   }
   private async removeEvents() {
-   await this.removeValidateVotes();
+    await this.removeValidateVotes();
+    await this.removeModifyVotes();
   }
 }
