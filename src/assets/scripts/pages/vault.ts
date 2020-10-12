@@ -8,6 +8,7 @@ import Toast from '../utils/toast';
 import { VaultWorker } from '../workers/vault';
 import { BalancesWorker } from '../workers/balances';
 import app from '../app';
+import Author from '../models/author';
 
 export default class PageVault {
   private chart: ApexCharts;
@@ -110,8 +111,9 @@ export default class PageVault {
     for(let i = 0, j = users.length; i < j; i++) {
       const v = usersAndBalances[users[i]];
 
-      const arId = await app.getAccount().getArweaveId(users[i]);
-      const avatar = arId.avatarDataUri || await app.getAccount().getIdenticon(users[i]);
+      const acc = new Author(null, users[i], null);
+      const arId = await acc.getDetails();
+      const avatar = arId.avatar;
       
       
       html += `

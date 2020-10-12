@@ -13,6 +13,10 @@
     "url": "https://github.com/CommunityXYZ/website.git"
   },
   "browserslist": "last 4 version",
+  "resolutions": {
+    "browserslist": "4.14.2",
+    "caniuse-lite": "1.0.30001129"
+  },
   "postcss": {
     "plugins": {
       "postcss-normalize": {},
@@ -45,15 +49,16 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
+    "@emeraldpay/hashicon": "^0.5.1",
     "@sentry/browser": "^5.22.3",
     "@sentry/tracing": "^5.22.3",
     "apexcharts": "^3.20.0",
     "arweave": "^1.9.1",
-    "arweave-id": "^2.0.7",
     "bootstrap": "twbs/bootstrap#4fc701f",
-    "community-js": "^1.0.15",
+    "community-js": "git://github.com/vporton/community-js.git#upload",
     "express": "^4.17.1",
     "feather-icons": "^4.28.0",
+    "jdenticon": "^3.0.1",
     "jquery": "^3.5.1",
     "moment": "^2.27.0",
     "peity": "^3.3.0",

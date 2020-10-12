@@ -6,7 +6,6 @@
  */
 
 import feather from 'feather-icons';
-import Arweave from 'arweave';
 import $ from '../libs/jquery';
 import { GQLEdgeInterface } from '../interfaces/gqlResult';
 import Deferred from './deferred';

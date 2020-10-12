@@ -1,7 +1,4 @@
-import { spawn, ModuleThread } from "threads";
-
 import $ from '../libs/jquery';
-import { BalancesWorker } from "../workers/balances";
 import app from "../app";
 import Opportunities from "../models/opportunities";
 import Utils from "../utils/utils";

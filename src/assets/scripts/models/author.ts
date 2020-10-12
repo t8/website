@@ -1,5 +1,5 @@
+import jdenticon from 'jdenticon';
 import AuthorInterface from "../interfaces/author";
-import { get, getIdenticon } from "../utils/arweaveid";
 import communityDB from "../libs/db";
 
 export default class Author {
@@ -26,7 +26,7 @@ export default class Author {
       if(res) {
         author = res;
       } else {
-        author = await get(this._address);
+        author = {name: this.address, address: this.address};
         try {
           // @ts-ignore
           communityDB.set(this._address, author, (new Date().getTime() + 30 * 60 * 1000));
@@ -34,7 +34,13 @@ export default class Author {
       }
       
       this._name = author.name || this._address;
-      this._avatar = author.avatarDataUri || getIdenticon(this._address);
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = 32;
+      canvas.height = 32;
+      jdenticon.drawIcon(canvas.getContext('2d'), this._name, 32);
+      this._avatar = canvas.toDataURL();
+      console.log(this._avatar);
     }
 
     return {

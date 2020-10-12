@@ -1,5 +1,3 @@
-import Arweave from "arweave";
-
 export default class Utils {
 
   static async pause(timeout: number = 500) {
