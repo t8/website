@@ -8,7 +8,7 @@ import { StateInterface } from 'community-js/lib/faces';
 import Utils from '../utils/utils';
 import Toast from '../utils/toast';
 import app from '../app';
-import { getIdenticon, get } from '../utils/arweaveid';
+import Author from '../models/author';
 
 export default class PageTokens {
   private chart: ApexCharts;
@@ -75,8 +75,9 @@ export default class PageTokens {
 
     for(let i = 0, j = holders.length; i < j; i++) {
       const holder = holders[i];
-      const arId = await get(holder.address);
-      const avatar = arId.avatarDataUri || getIdenticon(holder.address);
+      const acc = new Author(null, holder.address, null);
+      const arId = await acc.getDetails();
+      const avatar = arId.avatar;
       const balance = holder.balance > holder.vaultBalance? holder.balance-holder.vaultBalance : holder.vaultBalance-holder.balance;
 
       let role = '-';

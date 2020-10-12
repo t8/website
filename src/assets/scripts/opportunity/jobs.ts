@@ -3,7 +3,6 @@ import "quill/dist/quill.snow.css";
 import moment from "moment";
 import jobboard from "./jobboard";
 import Utils from "../utils/utils";
-import { getIdenticon, get } from "../utils/arweaveid";
 import Opportunity from "../models/opportunity";
 
 export default class PageJobs {

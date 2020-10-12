@@ -1,7 +1,6 @@
 import jobboard from "./jobboard";
 import Utils from "../utils/utils";
 import moment from "moment";
-import { getIdenticon, get } from "../utils/arweaveid";
 import Toast from "../utils/toast";
 import Opportunity from "../models/opportunity";
 import Applicant from "../models/applicant";

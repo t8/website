@@ -5,7 +5,7 @@ import { VoteInterface, VoteStatus, VoteType, StateInterface } from "community-j
 import app from '../app';
 import Utils from '../utils/utils';
 import Toast from '../utils/toast';
-import { getIdenticon, get } from '../utils/arweaveid';
+import Author from './author';
 
 export default class Vote implements VoteInterface {
   status?: VoteStatus;
@@ -94,13 +94,14 @@ export default class Vote implements VoteInterface {
 
     let details = '';
     if(this.type === 'mint' || this.type === 'mintLocked' || this.type === 'burnVault') {
-      const arId = await get(this.recipient || this.target);
-      let avatar = arId.avatarDataUri || getIdenticon(this.recipient || this.target);
+      const acc = new Author(null, this.recipient || this.target, null);
+      const arId = await acc.getDetails();
+
       details = `
       <div class="mb-3">
         <h3 class="mb-0">${this.type === 'burnVault' ? 'Target' : 'Recipient'}</h3>
         <div class="d-flex lh-sm py-1 align-items-center">
-          <span class="avatar mr-2" style="background-image: url(${avatar})"></span>
+          <span class="avatar mr-2" style="background-image: url(${arId.avatar})"></span>
           <div class="flex-fill">
             <div class="strong">${arId.name || (this.recipient || this.target)}</div>
             <div class="text-muted text-h5">${this.recipient || this.target}</div>
@@ -221,8 +222,9 @@ export default class Vote implements VoteInterface {
     if(this.voted.length) {
       const maxLength = this.voted.length > 5? 5 : this.voted.length;
       for(let i = 0, j = maxLength; i < j; i++) {
-        const arId = await get(this.voted[i]);
-        const avatar = arId.avatarDataUri || getIdenticon(this.voted[i]);
+        const acc = new Author(null, this.voted[i], null);
+        const arId = await acc.getDetails();
+        const avatar = arId.avatar;
         avatarList += `<span class="avatar" style="background-image: url(${avatar})"></span>`;
       }
 

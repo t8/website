@@ -5,7 +5,7 @@ import $ from './libs/jquery';
 import './global';
 import arweave from "./libs/arweave";
 import Community from "community-js";
-import GQLResultInterface, { GQLEdgeInterface } from './interfaces/gqlResult';
+import GQLResultInterface from './interfaces/gqlResult';
 import { StateInterface } from "community-js/lib/faces";
 import { ModuleThread, spawn } from 'threads';
 import { TokensWorker } from "./workers/tokens";

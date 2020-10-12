@@ -1,11 +1,12 @@
 import { JWKInterface } from "arweave/web/lib/wallet";
+import jdenticon from 'jdenticon';
 
 import $ from '../libs/jquery';
 import Toast from '../utils/toast';
 import Community from "community-js";
-import { getIdenticon, get } from "../utils/arweaveid";
 import arweave from "../libs/arweave";
 import communityDB from "../libs/db";
+import Author from "./author";
 
 export default class Account {
   private community: Community;
@@ -36,11 +37,11 @@ export default class Account {
     this.isInitialized = true;
   }
 
-  async getArweaveId(address: string = this.address) {
-    return get(address);
+  async getArweaveId() {
+    return {name: this.username, address: this.address};
   }
-  async getIdenticon(address: string = this.address): Promise<string> {
-    return getIdenticon(address);
+  async getAvatar(): Promise<string> {
+    return this.avatar;
   }
   async isLoggedIn(): Promise<boolean> {
     if(!this.isInitialized) {
@@ -73,9 +74,10 @@ export default class Account {
     this.address = await this.community.setWallet(wallet);
     this.arBalance = +arweave.ar.winstonToAr((await arweave.wallets.getBalance(this.address)), { formatted: true, decimals: 5, trim: true });
 
-    const acc = await get(this.address);
+    const account = new Author(null, this.address, null);
+    const acc = await account.getDetails(); 
     this.username = acc.name;
-    this.avatar = acc.avatarDataUri || getIdenticon(this.address);
+    this.avatar = acc.avatar;
 
     $('.user-name').text(this.username);
     $('.user-avatar').css('background-image', `url(${this.avatar})`);
