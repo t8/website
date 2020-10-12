@@ -6,6 +6,7 @@ import app from '../app';
 import Utils from '../utils/utils';
 import Toast from '../utils/toast';
 import Author from './author';
+import arweave from '../libs/arweave';
 
 export default class Vote implements VoteInterface {
   status?: VoteStatus;
@@ -124,7 +125,15 @@ export default class Vote implements VoteInterface {
       </div>`;
     }
     if(this.type === 'set') {
-      const val = this.key === 'quorum' || this.key === 'support'? `${this.value*100}%` : this.value;
+      let val = this.value;
+      console.log(this.key);
+      if(this.key === 'quorum' || this.key === 'support') {
+        val = `${this.value*100}%`;
+      } else if(this.key === 'communityLogo') {
+        const config = arweave.api.getConfig();
+        val = `<img src="${config.protocol}://${config.host}:${config.port}/${this.value}" style="height: 120px; width: auto;">`;
+      }
+
       details += `
       <div class="mb-3">
         <h3 class="mb-0">Key</h3>
