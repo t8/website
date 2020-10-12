@@ -122,7 +122,7 @@ const loadCards = async () => {
     let avatarList = '';
     const max = users.length > 5? 5 : users.length;
     for(let i = 0; i < max; i++) {
-      const author = new Author(users[i].address, users[i].address, null);
+      const author = new Author(null, users[i].address, null);
       const aDetails: AuthorInterface = await author.getDetails();
       avatarList += `<span class="avatar" data-toggle="tooltip" data-placement="top" title="${aDetails.address}" data-original-title="${aDetails.address}" style="background-image: url(${aDetails.avatar})"></span>`;
     }

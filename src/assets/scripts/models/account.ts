@@ -1,5 +1,4 @@
 import { JWKInterface } from "arweave/web/lib/wallet";
-import jdenticon from 'jdenticon';
 
 import $ from '../libs/jquery';
 import Toast from '../utils/toast';
