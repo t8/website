@@ -73,6 +73,8 @@ export default class PageVotes {
       const qty = hashes[4];
       const lockLength = hashes[5];
 
+      console.log(hashes, lockLength, !!lockLength);
+
       if(addy) {
         $('#vote-recipient').val(addy.trim());
       }
@@ -80,7 +82,7 @@ export default class PageVotes {
         $('#vote-qty').val(qty.trim());
       }
       if(lockLength) {
-        $('#vote-lock').val(lockLength.trim());
+        $('#vote-lock-length').val(lockLength.trim());
       }
 
       $('#modal-new-vote').modal('show');
