@@ -1,6 +1,7 @@
 import "threads/register";
-import "../styles/style.scss";
+import jdenticon from 'jdenticon';
 
+import "../styles/style.scss";
 import $ from './libs/jquery';
 import './global';
 import arweave from "./libs/arweave";
@@ -129,11 +130,20 @@ const loadCards = async () => {
 
     const oppsTotal = opps[commIds[i]]? opps[commIds[i]] : 0;
 
+    let avatar = '';
+    if(state.settings.has('communityLogo')) {
+      const config = arweave.api.getConfig();
+      avatar = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`;
+    }
+
     list.push({ 
       html: `
       <div class="col-md-6">
         <a class="card" href="./index.html#${comm}" data-community="${comm}" target="_blank">
           <div class="card-body text-center">
+            <div class="mb-3">
+              <span class="avatar avatar-xl" style="background-image: url(${avatar})"></span>
+            </div>
             <h4 class="card-title m-0">${state.name} (${state.ticker})</h4>
             <div class="text-muted">${comm}</div>
             <small class="opps">${oppsTotal} Opportunities</small> | 

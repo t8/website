@@ -40,7 +40,6 @@ export default class Author {
       canvas.height = 32;
       jdenticon.drawIcon(canvas.getContext('2d'), this._name, 32);
       this._avatar = canvas.toDataURL();
-      console.log(this._avatar);
     }
 
     return {
