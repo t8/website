@@ -4,6 +4,8 @@ import moment from "moment";
 import jobboard from "./jobboard";
 import Utils from "../utils/utils";
 import Opportunity from "../models/opportunity";
+import Community from "community-js";
+import arweave from "../libs/arweave";
 
 export default class PageJobs {
   private opps: Opportunity[] = [];
@@ -90,8 +92,20 @@ export default class PageJobs {
       const oppId = $job.attr('data-opp-id');
 
       jobboard.getOpportunities().get(oppId).then(async opp => {
-        const author = await opp.author.getDetails();
-        $job.find('.avatar').attr('style', `background-image: url(${author.avatar})`);
+        const comm = new Community(arweave);
+        await comm.setCommunityTx(opp.community.id);
+        const state = await comm.getState();
+        console.log(state.settings);
+        // TODO: Show the user avatar or the community logo
+        let logo = '';
+        if(state.settings.has('communityLogo')) {
+          const config = arweave.api.getConfig();
+          logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`; 
+        } else {
+          const author = await opp.author.getDetails();
+          logo = author.avatar;
+        }
+        $job.find('.avatar').attr('style', `background-image: url(${logo})`);
       });
     });
 
