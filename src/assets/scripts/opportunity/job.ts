@@ -5,6 +5,7 @@ import Toast from "../utils/toast";
 import Opportunity from "../models/opportunity";
 import Applicant from "../models/applicant";
 import arweave from "../libs/arweave";
+import Community from "community-js";
 
 export default class PageJob {
   private opportunity: Opportunity;
@@ -64,10 +65,24 @@ export default class PageJob {
   private async show() {
     await this.syncPageState();
 
+    const comm = new Community(arweave);
+    await comm.setCommunityTx(this.opportunity.community.id).then(async () => {
+      const state = await comm.getState();
+      console.log(state.settings);
+      // TODO: Show the user avatar or the community logo
+      let logo = '';
+      if(state.settings.has('communityLogo')) {
+        const config = arweave.api.getConfig();
+        logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`; 
+        $('.community-logo').css('background-image', `url(${logo})`);
+      }
+    });
+    
+
     this.opportunity.author.getDetails().then((author) => {
       $('.creator-addy').attr('data-original-title', author.address).text(author.name || author.address);
-    $('[data-toggle="tooltip"]').tooltip();
-    $('.creator-avatar').css('background-image', `url(${author.avatar})`);
+      $('[data-toggle="tooltip"]').tooltip();
+      $('.creator-avatar').css('background-image', `url(${author.avatar})`);
     });
 
     const lock = this.opportunity.lockLength? `Locked: ${Utils.formatMoney(this.opportunity.lockLength, 0)} blocks` : '';

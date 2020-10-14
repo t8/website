@@ -23,14 +23,18 @@
           .card
             .card-body
               .row.mb-3
-                .col-12.mb-3
+                .col-auto.mb-3
+                  h5.subheader Community
+                  .d-flex.align-items-center
+                    .float-left.mr-3
+                      span.community-logo.avatar.rounded(style="background-image: url()")
+                    a.opp-community.text-truncate.d-block(target="_blank", data-toggle="tooltip", data-placement="top") Community Name
+                .col-auto.mb-3
                   h5.subheader Creator
-                  .align-items-center
+                  .d-flex.align-items-center
                     .float-left.mr-3.mt-1
                       span.creator-avatar.avatar(style="background-image: url()")
-                    .lh-sm.text-truncate
-                      .creator-addy.d-inline.strong.text-truncate(data-toggle="tooltip" data-placement="top")
-                      a.opp-community.text-truncate.d-block(target="_blank") Community Name
+                    .creator-addy.d-inline.strong.text-truncate(data-toggle="tooltip" data-placement="top")
                 .col-12.mb-3.is-not-owner
                   a.btn-contact-creator.d-flex.btn.btn-light(href="#", target="_blank") Contact on WeveMail
               .row
