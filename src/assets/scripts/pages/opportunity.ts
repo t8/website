@@ -4,6 +4,7 @@ import Opportunities from "../models/opportunities";
 import Utils from "../utils/utils";
 import moment from "moment";
 import Opportunity from "../models/opportunity";
+import arweave from '../libs/arweave';
 
 export default class PageOpportunity {
   private opportunities: Opportunities;
@@ -37,6 +38,13 @@ export default class PageOpportunity {
     $('[data-total]').text(0);
     $('.bounty-type').find('[data-total="All"]').text(opps.length);
 
+    const state = await app.getCommunity().getState();
+    let logo = '';
+    if(state.settings.get('communityLogo')) {
+      const config = arweave.api.getConfig();
+      logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`;
+    }
+
     let html = '';
     for(let i = 0, j = opps.length; i < j; i++) {
       const opp = opps[i];
@@ -51,7 +59,7 @@ export default class PageOpportunity {
 
       html += `
       <a data-author="${opp.author.address}" data-opp-id="${opp.id}" class="jobs-job list-item" href="./opportunity.html#${opp.id}" target="_blank">
-        <span class="avatar"></span>
+        <span class="avatar rounded" style="background-image: url(${logo})"></span>
         <div>
           <span class="text-body d-block">${opp.title}</span>
           <small class="d-block text-muted mt-n1"> 
@@ -69,17 +77,6 @@ export default class PageOpportunity {
     }
 
     $('.jobs-list').html(html);
-
-    $('.jobs-job').each((i, el) => {
-      const $job = $(el);
-      const oppId = $job.attr('data-opp-id');
-
-      this.opportunities.get(oppId).then(async opp => {
-        const author = await opp.author.getDetails();
-        $job.find('.avatar').attr('style', `background-image: url(${author.avatar})`);
-      });
-    });
-
     $('.jobs-list').parents('.dimmer').removeClass('active');
   }
 

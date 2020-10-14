@@ -5,7 +5,6 @@ export interface OpportunityCommunityInterface {
   id: string;
   name: string;
   ticker: string;
-  logo: string;
 }
 
 export default interface OpportunityInterface {

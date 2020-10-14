@@ -142,7 +142,7 @@ const loadCards = async () => {
         <a class="card" href="./index.html#${comm}" data-community="${comm}" target="_blank">
           <div class="card-body text-center">
             <div class="mb-3">
-              <span class="avatar avatar-xl" style="background-image: url(${avatar})"></span>
+              <span class="avatar avatar-xl rounded" style="background-image: url(${avatar})"></span>
             </div>
             <h4 class="card-title m-0">${state.name} (${state.ticker})</h4>
             <div class="text-muted">${comm}</div>
