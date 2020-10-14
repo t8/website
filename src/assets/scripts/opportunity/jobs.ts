@@ -68,7 +68,7 @@ export default class PageJobs {
 
       html += `
       <a data-author="${opp.author.address}" data-opp-id="${opp.id}" class="jobs-job list-item" href="#${opp.id}">
-        <span class="avatar"></span>
+        <span class="avatar rounded"></span>
         <div>
           <span class="text-body d-block">${opp.title}</span>
           <small class="d-block text-muted mt-n1"> 
@@ -101,9 +101,6 @@ export default class PageJobs {
         if(state.settings.has('communityLogo')) {
           const config = arweave.api.getConfig();
           logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`; 
-        } else {
-          const author = await opp.author.getDetails();
-          logo = author.avatar;
         }
         $job.find('.avatar').attr('style', `background-image: url(${logo})`);
       });
