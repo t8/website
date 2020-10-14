@@ -5,6 +5,7 @@ import { BalancesWorker } from "../workers/balances";
 import { VotesWorker } from "../workers/votes";
 import Utils from "../utils/utils";
 import app from "../app";
+import arweave from "../libs/arweave";
 
 export default class PageDashboard {
   // workers
@@ -35,6 +36,26 @@ export default class PageDashboard {
 
   public async syncPageState() {
     const state = await app.getCommunity().getState();
+
+    $('.comm-title').text(state.name);
+    $('.comm-description').text(state.settings.get('description') || '');
+    $('.app-link').attr('src', state.settings.get('appUrl') || '#!').text(state.settings.get('appUrl') || '');
+
+    const links = state.settings.get('discussionLinks');
+    if(links && links.length) {
+      $('.comm-links').empty();
+      links.forEach((link) => {
+        $('.comm-links').append(`
+        <div class="col-auto">
+          <a href="${link}" class="small" target="_blank">${link}</a>
+        </div>`);
+      });
+    }
+
+    if(state.settings.get('communityLogo')) {
+      const config = arweave.api.getConfig();
+      $('.comm-logo').css('background-image', `url(${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')})`);
+    }
 
     const {users, balance} = await this.balancesWorker.usersAndBalance(state.balances);
     const {vaultUsers, vaultBalance} = await this.balancesWorker.vaultUsersAndBalance(state.vault);

@@ -136,17 +136,18 @@ const loadCards = async () => {
       avatar = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`;
     }
 
+    const oppTxt = oppsTotal === 1? 'Opportunity' : 'Opportunities';
     list.push({ 
       html: `
       <div class="col-md-6">
         <a class="card" href="./index.html#${comm}" data-community="${comm}" target="_blank">
           <div class="card-body text-center">
             <div class="mb-3">
-              <span class="avatar avatar-xl rounded" style="background-image: url(${avatar})"></span>
+              <span class="avatar avatar-lg rounded" style="background-image: url(${avatar})"></span>
             </div>
             <h4 class="card-title m-0">${state.name} (${state.ticker})</h4>
             <div class="text-muted">${comm}</div>
-            <small class="opps">${oppsTotal} Opportunities</small> | 
+            <small class="opps">${oppsTotal} ${oppTxt}</small> | 
             <small class="members">${users.length} Members</small><br>
             <div class="avatar-list avatar-list-stacked mt-3 mb-3">
               ${avatarList}

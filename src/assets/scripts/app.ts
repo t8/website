@@ -223,7 +223,9 @@ class App {
 
     await this.updateTxFee();
     await this.currentPage.open();
-    $('.page-header').find('.page-title').text((await this.community.getState()).name);
+
+    const state = await this.community.getState();
+    $('.page-header').find('.page-title').text(state.name);
   }
 
   private async updateTxFee() {
