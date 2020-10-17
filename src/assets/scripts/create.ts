@@ -15,6 +15,9 @@ const account = new Account(community);
 let currentStep = 1;
 const create = {
   communityName: '',
+  communityLogo: '',
+  communityDescription: '',
+  communityAppUrl: '',
   ticker: '',
   balances: {},
   support: 0,
@@ -71,9 +74,19 @@ const validate = async (e: any) => {
 
   } else if(currentStep === 2) {
     create.communityName = $('#communityname').val().toString().trim();
+    create.communityLogo = $('#communitylogo').val().toString().trim();
+    create.communityDescription = $('#communitydesc').val().toString().trim();
+    create.communityAppUrl = $('#communityappurl').val().toString().trim();
     create.ticker = $('#psttoken').val().toString().trim().toUpperCase();
 
     $('.communityname').text(create.communityName);
+    $('.communitydesc').text(create.communityDescription);
+    $('.communityappurl').text(create.communityAppUrl);
+
+    const config = arweave.api.getConfig();
+    const logo = `${config.protocol}://${config.host}:${config.port}/${create.communityLogo}`;
+
+    $('.communitylogo').attr('src', logo);
     $('.ticker').text(create.ticker);
 
     const $holders = $('.holder');
@@ -145,7 +158,21 @@ const validate = async (e: any) => {
       allowContinue();
     }
   } else if(currentStep === 4) {
-    await community.setState(create.communityName, create.ticker, create.balances, create.quorum, create.support, create.voteLength, create.lockMinLength, create.lockMaxLength);
+    await community.setState(
+      create.communityName, 
+      create.ticker, 
+      create.balances, 
+      create.quorum, 
+      create.support, 
+      create.voteLength, 
+      create.lockMinLength, 
+      create.lockMaxLength, 
+      {}, [], {}, 
+      [
+        ['communityLogo', create.communityLogo],
+        ['communityDescription', create.communityDescription],
+        ['communityAppUrl', create.communityAppUrl]
+      ]);
     const cost = await community.getCreateCost();
     const ar = +arweave.ar.winstonToAr(cost, {formatted: true, decimals: 5, trim: true});
     $('.cost').text(ar);
@@ -165,10 +192,22 @@ const validate = async (e: any) => {
 // @ts-ignore
 window.currentPage = {syncPageState: () => { console.log('currentPage'); validate(null); }};
 
+const handleLogo = async () => {
+  const dropbox = new Dropbox($('.logo-box'));
+  dropbox.showAndDeploy(await account.getWallet()).then(logoId => {
+    if(logoId) {
+      $('#communitylogo').val(logoId);
+    }
+
+    handleLogo();
+  });
+};
+
 $(async () => {
   await account.init();
+  handleLogo();
   
-  $('[data-toggle="tooltip"]').tooltip();
+  $('[data-toggle="popover"]').popover();
 
   $('.back').on('click', (e: any) => {
     e.preventDefault();

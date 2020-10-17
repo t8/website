@@ -38,10 +38,10 @@ export default class PageDashboard {
     const state = await app.getCommunity().getState();
 
     $('.comm-title').text(state.name);
-    $('.comm-description').text(state.settings.get('description') || '');
-    $('.app-link').attr('src', state.settings.get('appUrl') || '#!').text(state.settings.get('appUrl') || '');
+    $('.comm-description').text(state.settings.get('communityDescription') || '');
+    $('.app-link').attr('src', state.settings.get('communityAppUrl') || '#!').text(state.settings.get('communityAppUrl') || '');
 
-    const links = state.settings.get('discussionLinks');
+    const links = state.settings.get('communityDiscussionLinks');
     if(links && links.length) {
       $('.comm-links').empty();
       links.forEach((link) => {

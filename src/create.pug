@@ -52,6 +52,31 @@ html(lang="en")
                       span.form-help(data-toggle="popover", data-placement="top", data-content="What's your Community organization's name.", data-html="false") ?
                   
                 .mb-3
+                  label.form-label(for="communitylogo") Community logo
+                  .row.row-sm
+                    .col
+                      input#communitylogo.form-control(type="text")
+                    .col-auto.align-self-center
+                      span.form-help(data-toggle="popover", data-placement="top", data-content="Set the Arweave TXID of your logo, if not yet deployed, drag and drop your logo on the box below to deploy.", data-html="false") ?
+                  .logo-box.mt-1
+
+                .mb-3
+                  label.form-label(for="communityappurl") Project link
+                  .row.row-sm
+                    .col
+                      input#communityappurl.form-control(type="text")
+                    .col-auto.align-self-center
+                      span.form-help(data-toggle="popover", data-placement="top", data-content="If your Community has an extenal website, add the URL here.", data-html="false") ?
+
+                .mb-3
+                  label.form-label(for="communitydesc") Community description
+                  .row.row-sm
+                    .col
+                      textarea#communitydesc.form-control
+                    .col-auto.align-self-center
+                      span.form-help(data-toggle="popover", data-placement="top", data-content="Give a short and concise description about your Community.", data-html="false") ?
+
+                .mb-3
                   label.form-label(for="psttoken") PST token ticker
                   .row.row-sm
                     .col
@@ -142,8 +167,18 @@ html(lang="en")
                     .tab-content
                       #general.tab-pane.active.show
                         .mb-3
+                          .form-label Community Logo
+                          img.communitylogo
+                        .mb-3
                           .form-label Community Name
                           .form-control-plaintext.communityname
+                        .mb-3
+                          .form-label Community Link
+                          .form-control-plaintext.communityappurl
+                        .mb-3
+                          .form-label Community Description
+                          .form-control-plaintext.communitydesc
+                        
                         .mb-3
                           .form-label Wallet Address
                           .form-control-plaintext.addy

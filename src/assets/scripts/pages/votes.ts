@@ -5,6 +5,7 @@ import app from '../app';
 import arweave from "../libs/arweave";
 import Vote from '../models/vote';
 import { VoteType, VoteInterface } from 'community-js/lib/faces';
+import Dropbox from '../utils/dropbox';
 
 export default class PageVotes {
   private votes: Vote[] = [];
@@ -210,29 +211,18 @@ export default class PageVotes {
     return valid;
   }
 
-  // Change the input fields after input
-  private modifyVotes() {
-    $('#vote-logo-upload').on('change', e0 => {
-      const fileReader = new FileReader();
-      fileReader.onload = async e => {
-        const contentType = (e0.target as any).files[0].type;
-        // For old browsers accept="..." does not work, so check here:
-        if(['image/png', 'image/jpeg', 'image/webp'].indexOf(contentType) == -1) {
-          alert("Must be an image.");
-          return;
-        }
-        const fileContent = e.target.result as ArrayBuffer;
-
-        const { transaction, response } = await app.getCommunity().uploadFile(fileContent, contentType);
-        if(response.status != 200) {
-            alert("Failed ArWeave transaction.");
-            return;
-        }
-        $('#vote-set-value').val(transaction.id);
-        this.showLogo(transaction.id)
-      };
-      fileReader.readAsArrayBuffer((e0.target as any).files[0]);
+  private async handleLogo() {
+    const dropbox = new Dropbox($('.logo-box'));
+    dropbox.showAndDeploy(await app.getAccount().getWallet()).then(logoId => {
+      if(logoId) {
+        $('#vote-set-value').val(logoId);
+        this.showLogo(logoId);
+      }
+      this.handleLogo();
     });
+  }
+  private modifyVotes() {
+    this.handleLogo();
 
     // Disallow spaces
     $('#vote-set-name').on('input', e => {
@@ -286,10 +276,13 @@ export default class PageVotes {
       $('.vote-recipient').hide();
       $('.vote-set-name').hide();
       $('#vote-set-value-is-number-label').hide();
-      if(setKey !== 'description') {
+      if(setKey !== 'communityDescription') {
         $('#vote-set-value2').hide();
       }
-      if(setKey !== 'discussionLinks') {
+      if(setKey !== 'communityAppUrl') {
+        $('#vote-set-value2').removeClass('url');
+      }
+      if(setKey !== 'communityDiscussionLinks') {
         $('#vote-set-value').show();
         $('#vote-set-value-links-container').hide();
       }
@@ -298,6 +291,7 @@ export default class PageVotes {
         $('#vote-logo-upload').hide();
       }
       $('#vote-set-value').removeClass('input-number input-float percent url');
+
       switch(setKey) {
         case 'role':
           $('.vote-recipient').show();
@@ -310,18 +304,18 @@ export default class PageVotes {
         case 'support':
           $target.addClass('input-number percent');
           break;
-        case 'description':
+        case 'communityDescription':
           $('#vote-set-value').hide();
           $('#vote-set-value2').show();
           break;
-        case 'appUrl':
+        case 'communityAppUrl':
           $target.addClass('url');
           break;
         case 'communityLogo':
           $('#vote-logo-upload').show();
           $target.trigger('input');
           break;
-        case 'discussionLinks':
+        case 'communityDiscussionLinks':
           $('#vote-set-value').hide();
           $('#vote-set-value-links-container').show();
           break;
@@ -455,7 +449,7 @@ export default class PageVotes {
       const target = $('#vote-target').val().toString().trim();
       const setKey = $('#vote-set-key').val();
       let setValue : string | number | string[];
-      if(setKey === 'discussionLinks') {
+      if(setKey === 'communityDiscussionLinks') {
         const rows = $('#vote-set-value-links-template').nextAll();
         setValue = rows.find('input[type=text]').map(function() { return $(this).val().toString(); }).get();
       } else if($('#vote-set-value2').css('display') !== 'none') {

@@ -59,7 +59,7 @@
     "apexcharts": "^3.20.0",
     "arweave": "^1.9.1",
     "bootstrap": "twbs/bootstrap#4fc701f",
-    "community-js": "git://github.com/vporton/community-js.git#upload",
+    "community-js": "^1.1.1",
     "express": "^4.17.1",
     "feather-icons": "^4.28.0",
     "jdenticon": "^3.0.1",
