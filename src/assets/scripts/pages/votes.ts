@@ -62,6 +62,7 @@ export default class PageVotes {
       $('.proposals').html(html);
     }
 
+    // @ts-ignore
     $('[data-toggle="tooltip"]').tooltip();
     $('.dimmer').removeClass('active');
   }
@@ -74,8 +75,6 @@ export default class PageVotes {
       const qty = hashes[4];
       const lockLength = hashes[5];
 
-      console.log(hashes, lockLength, !!lockLength);
-
       if(addy) {
         $('#vote-recipient').val(addy.trim());
       }
@@ -86,6 +85,7 @@ export default class PageVotes {
         $('#vote-lock-length').val(lockLength.trim());
       }
 
+      // @ts-ignore
       $('#modal-new-vote').modal('show');
     }
   }
@@ -212,7 +212,8 @@ export default class PageVotes {
   }
 
   private async handleLogo() {
-    const dropbox = new Dropbox($('.logo-box'));
+    const dropbox = new Dropbox($('#logo-box'));
+    console.log(await app.getAccount().getWallet());
     dropbox.showAndDeploy(await app.getAccount().getWallet()).then(logoId => {
       if(logoId) {
         $('#vote-set-value').val(logoId);
@@ -222,8 +223,6 @@ export default class PageVotes {
     });
   }
   private modifyVotes() {
-    this.handleLogo();
-
     // Disallow spaces
     $('#vote-set-name').on('input', e => {
       let setName: string = $('#vote-set-name').val().toString().replace(' ', '-');
@@ -233,7 +232,7 @@ export default class PageVotes {
 
   private removeModifyVotes() {
     $('#vote-set-name').off('input');
-    $('#vote-logo-upload').off('change');
+    $('#logo-box').off('change');
   }
 
   async validateVotes() {
@@ -288,7 +287,7 @@ export default class PageVotes {
       }
       if(setKey !== 'communityLogo') {
         // $('#vote-set-value-logo-preview').hide();
-        $('#vote-logo-upload').hide();
+        $('#logo-box').hide();
       }
       $('#vote-set-value').removeClass('input-number input-float percent url');
 
@@ -312,7 +311,8 @@ export default class PageVotes {
           $target.addClass('url');
           break;
         case 'communityLogo':
-          $('#vote-logo-upload').show();
+          $('#logo-box').show();
+          this.handleLogo();
           $target.trigger('input');
           break;
         case 'communityDiscussionLinks':
@@ -532,6 +532,7 @@ export default class PageVotes {
         toast.show('Vote error', err.message, 'error', 3000);
       }
 
+      // @ts-ignore
       $('#modal-new-vote').modal('hide');
       $(e.target).removeClass('btn-loading disabled');
     });
