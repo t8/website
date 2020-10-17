@@ -6,6 +6,7 @@ import Community from "community-js";
 import arweave from "../libs/arweave";
 import communityDB from "../libs/db";
 import Author from "./author";
+import Dropbox from "../utils/dropbox";
 
 export default class Account {
   private community: Community;
@@ -31,6 +32,8 @@ export default class Account {
     } catch(e) {
       console.log(e);
     }
+
+    await this.initWallet();
 
     this.events();
     this.isInitialized = true;
@@ -66,7 +69,16 @@ export default class Account {
     toast.show('Login first', 'Before being able to do this action you need to login.', 'login', duration);
   }
 
-  // Setters
+  // Private methods
+  private async initWallet() {
+    if($('.login-box').length) {
+      const deployer = new Dropbox($('.login-box'));
+      deployer.showLogin().then(async e => {
+        await this.login(e);
+        this.initWallet();
+      });
+    }
+  }
   private async loadWallet(wallet: JWKInterface) {
     this.wallet = wallet;
 
@@ -81,48 +93,52 @@ export default class Account {
     $('.user-name').text(this.username);
     $('.user-avatar').css('background-image', `url(${this.avatar})`);
 
-    // Complete login
-    $('.form-file-button').removeClass('btn-loading disabled');
     if(this.address.length && this.arBalance >= 0) {
       this.loggedIn = true;
       $('#login-modal').modal('hide');
       $('.loggedin').show();
       $('.loggedout').hide();
     }
+
+    // @ts-ignore
+    window.currentPage.syncPageState();
   }
 
-  private login(e: any) {
+  private async login(e: any) {
     if(e.target && e.target.files) {
-      $('.form-file-text').text($(e.target).val().toString().replace(/C:\\fakepath\\/i, ''));
-      $('.form-file-button').addClass('btn-loading disabled');
-
-      const fileReader = new FileReader();
-      fileReader.onload = async (ev: any) => {
-        await this.loadWallet(JSON.parse(fileReader.result.toString()));
-        // @ts-ignore
-        window.currentPage.syncPageState();
-        
-        if(this.address.length && this.arBalance >= 0) {
-          let isError = false;
-          try {
-            communityDB.set('sesswall', btoa(fileReader.result.toString()));
-          } catch(err) {
-            console.log(err);
-            isError = true;
-          }
-
-          if(isError) {
+      return new Promise(resolve => {
+        const fileReader = new FileReader();
+        fileReader.onload = async (ev: any) => {
+          await this.loadWallet(JSON.parse(fileReader.result.toString()));
+          // @ts-ignore
+          window.currentPage.syncPageState();
+          
+          if(this.address.length && this.arBalance >= 0) {
+            let isError = false;
             try {
-              communityDB.clearAll();
-              this.login(e);
+              communityDB.set('sesswall', btoa(fileReader.result.toString()));
             } catch(err) {
               console.log(err);
+              isError = true;
+            }
+  
+            if(isError) {
+              try {
+                communityDB.clearAll();
+                resolve(this.login(e));
+              } catch(err) {
+                console.log(err);
+              }
             }
           }
-        }
-      };
-      fileReader.readAsText(e.target.files[0]);
+
+          resolve();
+        };
+        fileReader.readAsText(e.target.files[0]);
+      });
     }
+
+    return false;
   }
 
   private events() {

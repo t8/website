@@ -73,15 +73,4 @@ header.navbar.navbar-expand-md.navbar-light
                 i.icon(data-feather="briefcase")
               span.nav-link-title Opportunities
 
-#login-modal.modal.modal-blur.fade(role="dialog")
-  .modal-dialog(role="document"): .modal-content
-    .modal-body
-      .form-label Wallet key file
-      .form-file
-        input#wallet.form-file-upload.file-upload-default(type="file" style="display: none")
-        label.form-file-label(for="wallet")
-          span.form-file-text Choose a wallet...
-          span.form-file-button Browse
-
-    .modal-footer
-      a.btn.btn-link.link-secondary(data-dismiss="modal" href="#") Cancel
+include login

@@ -5,16 +5,15 @@ import $ from './libs/jquery';
 import "bootstrap/dist/js/bootstrap.bundle";
 
 import './global';
-import { JWKInterface } from "arweave/web/lib/wallet";
 import arweave from "./libs/arweave";
+import Dropbox from "./utils/dropbox";
+import Account from "./models/account";
 
 const community = new Community(arweave);
+const account = new Account(community);
 
 let currentStep = 1;
-let wallet: JWKInterface;
 const create = {
-  address: '',
-  balance: 0,
   communityName: '',
   ticker: '',
   balances: {},
@@ -55,27 +54,18 @@ const allowContinue = () => {
 }
 
 const validate = async (e: any) => {
-  if(currentStep === 1) {
-    if($('.form-file-button').text() !== 'Browse') return;
+  console.log(e, currentStep);
 
-    if(e.target && e.target.files) {
+  if(currentStep === 1) {
+    if(!e) {
+      $('.addy').text(await account.getAddress());
+      $('.bal').text(await account.getArBalance());
+
+      allowContinue();
+    } else if(e.target && e.target.files) {
       $('.form-file-text').text($(e.target).val().toString().replace(/C:\\fakepath\\/i, ''));
       $('.form-file-button').addClass('btn-loading disabled');
 
-      const fileReader = new FileReader();
-      fileReader.onload = async (ev: any) => {
-        wallet = JSON.parse(ev.target.result);
-        create.address = await community.setWallet(wallet);
-        create.balance = +arweave.ar.winstonToAr((await arweave.wallets.getBalance(create.address)), { formatted: true, decimals: 5, trim: true });
-
-        $('.addy').text(create.address);
-        $('.bal').text(create.balance);
-
-        $('.form-file-button').removeClass('btn-loading disabled');
-        allowContinue();
-      };
-      fileReader.readAsText(e.target.files[0]);
-    } else if(wallet && create.address && create.balance) {
       allowContinue();
     }
 
@@ -159,7 +149,7 @@ const validate = async (e: any) => {
     const cost = await community.getCreateCost();
     const ar = +arweave.ar.winstonToAr(cost, {formatted: true, decimals: 5, trim: true});
     $('.cost').text(ar);
-    if(create.balance < ar) {
+    if(await account.getArBalance() < ar) {
       $('.continue').removeClass('btn-primary').addClass('btn-danger').text('Not enough balance');
       return;
     }
@@ -172,7 +162,12 @@ const validate = async (e: any) => {
   }
 };
 
-$(() => {
+// @ts-ignore
+window.currentPage = {syncPageState: () => { console.log('currentPage'); validate(null); }};
+
+$(async () => {
+  await account.init();
+  
   $('[data-toggle="tooltip"]').tooltip();
 
   $('.back').on('click', (e: any) => {
@@ -222,17 +217,8 @@ $(() => {
       });
     }
   });
-
-  $('.file-upload-browse').on('click', (e: any) => {
-    e.preventDefault();
-
-    var file = $('.file-upload-default');
-    file.trigger('click');
-  });
   
-  $(document).on('change', 'input', (e: any) => {
-    validate(e);
-  }).on('keyup', (e: any) => {
+  $(document).on('keyup', (e: any) => {
     validate(e);
   });
 

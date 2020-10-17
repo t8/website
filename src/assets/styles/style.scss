@@ -29,3 +29,24 @@ object {
     border-color: rgba(87,92,102,.2);
   }
 }
+
+.deployer {
+  position: relative;
+  border: 1px dashed;
+  padding: 10px;
+
+  &.highlight {
+    border: 1px solid;
+    background: #F4F4F4;
+  }
+
+  input[type="file"] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    opacity: 0;
+  }
+}
