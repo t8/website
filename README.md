@@ -1,4 +1,4 @@
-<img src="src/assets/images/logo.svg" width="300px">
+![Community](https://raw.githubusercontent.com/CommunityXYZ/website/master/src/assets/images/logo.svg)
 
 This is the official website for CommunityXYZ.
 You can access the community here: https://community.xyz
