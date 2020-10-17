@@ -1045,10 +1045,10 @@
   resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-1.0.0.tgz#8ed028a10bb7527357b2655c360383b5f07c16ac"
   integrity sha512-0Fd4MQCbEh8OFSO+gG7wBXok7yRC3w+xe/wWM8KNye7EGoHr4BTFZNWV/1xAn2r8/gyFKxPXT8uxXRzDzGq6rg==
 
-"@types/bootstrap@^4.5.0":
-  version "4.5.1"
-  resolved "https://registry.yarnpkg.com/@types/bootstrap/-/bootstrap-4.5.1.tgz#9e11a2ccc79e5d6c116239571629db859ed82a9d"
-  integrity sha512-5iAWnZnqHucloYQFlozKUTPw0+fLfKo8d4flGCiE1B1w91z/91UIqMDht/31RQJIwx0+u5SL4CJCbs79Z15M+A==
+"@types/bootstrap@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@types/bootstrap/-/bootstrap-5.0.0.tgz#33507845c17ae9fc2284e5344b9dd17344848319"
+  integrity sha512-Buic9y01REuPhC7f3fvGN9ONoEKwkDnT/SdGcD7gk+99jrQnTC8QpPOfCMC7wZPKpPrTiizP0S4AC5MIH5PdQw==
   dependencies:
     "@types/jquery" "*"
     popper.js "^1.14.1"
@@ -1615,6 +1615,16 @@ browserslist@4.14.2, browserslist@^4.0.0, browserslist@^4.1.0, browserslist@^4.1
     escalade "^3.0.2"
     node-releases "^1.1.61"
 
+browserslist@4.14.5:
+  version "4.14.5"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.14.5.tgz#1c751461a102ddc60e40993639b709be7f2c4015"
+  integrity sha512-Z+vsCZIvCBvqLoYkBFTwEYH3v5MCQbsAjp50ERycpOjnPmolg1Gjy4+KaWWpm8QOJt9GHkhdqAl14NpCX73CWA==
+  dependencies:
+    caniuse-lite "^1.0.30001135"
+    electron-to-chromium "^1.3.571"
+    escalade "^3.1.0"
+    node-releases "^1.1.61"
+
 buffer-equal@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/buffer-equal/-/buffer-equal-0.0.1.tgz#91bc74b11ea405bc916bc6aa908faafa5b4aac4b"
@@ -1708,10 +1718,15 @@ caniuse-api@^3.0.0:
     lodash.memoize "^4.1.2"
     lodash.uniq "^4.5.0"
 
-caniuse-lite@1.0.30001129, caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001125:
+caniuse-lite@1.0.30001129, caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001125, caniuse-lite@^1.0.30001135:
   version "1.0.30001129"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001129.tgz#e6514b94c0ef50f98cf7476daa91228ddd2ef7bc"
   integrity sha512-9945fTVKS810DZITpsAbuhQG7Lam0tEfVbZlsBaCFZaszepbryrArS05PWmJSBQ6mta+v9iz0pUIAbW1eBILIg==
+
+caniuse-lite@1.0.30001148:
+  version "1.0.30001148"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001148.tgz#dc97c7ed918ab33bf8706ddd5e387287e015d637"
+  integrity sha512-E66qcd0KMKZHNJQt9hiLZGE3J4zuTqE1OnU53miEVtylFbwOEmeA5OsRu90noZful+XGSQOni1aT2tiqu/9yYw==
 
 canvas-renderer@~2.2.0:
   version "2.2.0"
@@ -1924,10 +1939,10 @@ commander@^5.0.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-5.1.0.tgz#46abbd1652f8e059bddaef99bbdcb2ad9cf179ae"
   integrity sha512-P0CysNDQ7rtVw4QIQtm+MRxV66vKFSvlsQvGYXZWR3qFU0jlMKHZZZgw8e+8DSah4UDKMqnknRDQz+xuQXQ/Zg==
 
-community-js@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/community-js/-/community-js-1.1.1.tgz#33b928f7329b7598f6f8c68810bebbde7d02e3e2"
-  integrity sha512-awNIDLP4lMMeGF+gjnszP4EZuiJr4obr8AwR0d3FG5VvqKSiqfMPkYaHnG94ODXfLCYgguvyQ7GbGFo2EjwD8g==
+community-js@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/community-js/-/community-js-1.1.2.tgz#4eccf98d3e7da3d7fa6801d9eb8cc36ef1e4de8d"
+  integrity sha512-8awLrFwgfONmRf0CYSjgOMotZk2YTwsUkTtEwlBNZtglpXlGLPtbgd9RL6MBBDFJDCgCv6c5LmM+EYkPJ+/S9Q==
   dependencies:
     arweave "^1.9.1"
     smartweave "^0.3.x"
@@ -2517,7 +2532,7 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
   integrity sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=
 
-electron-to-chromium@^1.3.564:
+electron-to-chromium@^1.3.564, electron-to-chromium@^1.3.571:
   version "1.3.582"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.582.tgz#1adfac5affce84d85b3d7b3dfbc4ade293a6ffc4"
   integrity sha512-0nCJ7cSqnkMC+kUuPs0YgklFHraWGl/xHqtZWWtOeVtyi+YqkoAOMGuZQad43DscXCQI/yizcTa3u6B5r+BLww==
@@ -2616,7 +2631,7 @@ es-to-primitive@^1.2.1:
     is-date-object "^1.0.1"
     is-symbol "^1.0.2"
 
-escalade@^3.0.2:
+escalade@^3.0.2, escalade@^3.1.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/escalade/-/escalade-3.1.1.tgz#d8cfdc7000965c5a0174b4a82eaa5c0552742e40"
   integrity sha512-k0er2gUkLf8O0zKJiAhmkTnJlTvINGv7ygDNPbeIsX/TJjGJZHuh9B2UxbsaEkmlEo9MfhrSzmhIlhRlI2GXnw==

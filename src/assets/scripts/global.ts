@@ -22,10 +22,12 @@ $(() => {
   feather.replace({width: 16, height: 16});
 
   try {
+    // @ts-ignore
     $('[data-toggle="tooltip"]').tooltip();
   } catch(e) {}
   
   try {
+    // @ts-ignore
     $('.toast').toast();
   } catch(e) {}
 });

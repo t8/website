@@ -207,6 +207,7 @@ $(async () => {
   await account.init();
   handleLogo();
   
+  // @ts-ignore
   $('[data-toggle="popover"]').popover();
 
   $('.back').on('click', (e: any) => {
