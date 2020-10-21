@@ -95,7 +95,10 @@ export default class Account {
 
     if(this.address.length && this.arBalance >= 0) {
       this.loggedIn = true;
-      $('#login-modal').modal('hide');
+      if($('#login-modal').length) {
+        // @ts-ignore
+        $('#login-modal').modal('hide');
+      }
       $('.loggedin').show();
       $('.loggedout').hide();
     }
