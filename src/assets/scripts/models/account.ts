@@ -113,8 +113,6 @@ export default class Account {
         const fileReader = new FileReader();
         fileReader.onload = async (ev: any) => {
           await this.loadWallet(JSON.parse(fileReader.result.toString()));
-          // @ts-ignore
-          window.currentPage.syncPageState();
           
           if(this.address.length && this.arBalance >= 0) {
             let isError = false;
