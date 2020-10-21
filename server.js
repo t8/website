@@ -157,8 +157,9 @@ app.get('/completeairdrop/:addy/:ref?', async (req, res) => {
     }
     await community.getState();
 
+    let txid = '';
     try {
-      await community.transfer(address, 10000);
+      txid = await community.transfer(address, 10000);
     } catch(e) {
       console.log(e);
       return res.send('Unable to do the transfer, try again later.');
@@ -169,7 +170,7 @@ app.get('/completeairdrop/:addy/:ref?', async (req, res) => {
         console.log(e);
       });
     }
-    return res.send('OK');
+    return res.send(`OK-${txid}`);
   }
 
   return res.send('DONE');

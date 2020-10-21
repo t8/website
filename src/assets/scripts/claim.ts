@@ -47,9 +47,17 @@ $(() => {
   $('.claim').on('click', async e => {
     e.preventDefault();
 
-    $(e.target).addClass('btn-loading disabled');
+    const $claim = $('.claim');
+
+    $claim.addClass('btn-loading disabled');
     $.get(`./completeairdrop/${await account.getAddress()}/${document.location.hash.replace('#', '').trim()}`, res => {
-      if(res === 'OK') {
+      if(res.startsWith('OK-')) {
+        const txid = res.replace('OK-', '').trim();
+        $('.txid').attr('href', `https://viewblock.io/arweave/tx/${txid}`).text(txid);
+        
+        $claim.hide();
+        $('.confirmed').show();
+
         alert('Tokens claimed!');
       } else if(res === 'DONE') {
         alert('Tokens already claimed!');
@@ -57,7 +65,7 @@ $(() => {
         alert(res);
       }
 
-      $(e.target).removeClass('btn-loading');
+      $claim.removeClass('disabled btn-loading');
     });
   });
 
