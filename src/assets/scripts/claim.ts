@@ -1,11 +1,13 @@
 import "../styles/style.scss";
+
+import Community from 'community-js';
+import $ from './libs/jquery';
 import "bootstrap/dist/js/bootstrap.bundle";
 
-import $ from './libs/jquery';
 import './global';
-import Community from "community-js";
-import arweave from "./libs/arweave";
 import Account from "./models/account";
+import arweave from "./libs/arweave";
+import Toast from "./utils/toast";
 
 const community = new Community(arweave);
 const account = new Account(community);
@@ -47,6 +49,7 @@ $(() => {
   $('.claim').on('click', async e => {
     e.preventDefault();
 
+    const toast = new Toast();
     const $claim = $('.claim');
 
     $claim.addClass('btn-loading disabled');
@@ -58,11 +61,11 @@ $(() => {
         $claim.hide();
         $('.confirmed').show();
 
-        alert('Tokens claimed!');
+        toast.show('Claimed', 'Tokens claimed!', 'success', 3000);
       } else if(res === 'DONE') {
-        alert('Tokens already claimed!');
+        toast.show('Error', 'Tokens already claimed!', 'error', 3000);
       } else {
-        alert(res);
+        toast.show('Error', res, 'error', 3000);
       }
 
       $claim.removeClass('disabled btn-loading');

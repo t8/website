@@ -1,3 +1,4 @@
+import "bootstrap/dist/js/bootstrap.bundle";
 import feather from 'feather-icons';
 
 import $ from '../libs/jquery';
