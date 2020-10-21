@@ -93,6 +93,8 @@ class App {
     await this.updateNetworkInfo();
     this.checkVersion();
     const t = await this.community.setCommunityTx(this.hashes[0]);
+
+    $('.navbar-brand').attr('href', '/index.html');
     $('body').show();
     
     await this.updateLinks();
