@@ -173,6 +173,7 @@ const loadCards = async () => {
 
   await Promise.all(gos);
   $('.opps-cards').html(list.sort((a, b) => (b.members+b.opportunities) - (a.members + a.opportunities)).map(a => a.html).join(''));
+  // @ts-ignore
   $('[data-toggle="tooltip"]').tooltip();
 }
 

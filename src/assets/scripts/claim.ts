@@ -27,7 +27,7 @@ window.currentPage = {
   syncPageState: async () => {
     if(await account.isLoggedIn()) {
       $('.logged-in-addy').text(await account.getAddress());
-      $('.ref-link').text(`https://community.xyz/airdrop#${await account.getAddress()}`);
+      $('.ref-link').text(`https://community.xyz/claim#${await account.getAddress()}`);
       $('.logged-in').show();
     } else {
       $('.logged-out').hide();
@@ -53,7 +53,7 @@ $(() => {
     const $claim = $('.claim');
 
     $claim.addClass('btn-loading disabled');
-    $.get(`./completeairdrop/${await account.getAddress()}/${document.location.hash.replace('#', '').trim()}`, res => {
+    $.get(`./completeclaim/${await account.getAddress()}/${document.location.hash.replace('#', '').trim()}`, res => {
       if(res.startsWith('OK-')) {
         const txid = res.replace('OK-', '').trim();
         $('.txid').attr('href', `https://viewblock.io/arweave/tx/${txid}`).text(txid);

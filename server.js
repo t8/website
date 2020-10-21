@@ -49,8 +49,8 @@ app.get('/communities.html', (_, res) => {
   res.redirect('/communities');
 });
 
-app.get('/airdrop.html', (_, res) => {
-  res.redirect('/airdrop');
+app.get('/claim.html', (_, res) => {
+  res.redirect('/claim');
 });
 
 app.get('/opportunity', (_, res) => {
@@ -69,15 +69,15 @@ app.get('/communities', (_, res) => {
   res.sendFile(path.join(__dirname, 'dist/communities.html'));
 });
 
-app.get('/airdrop', (_, res) => {
-  res.sendFile(path.join(__dirname, 'dist/airdrop.html'));
+app.get('/claim', (_, res) => {
+  res.sendFile(path.join(__dirname, 'dist/claim.html'));
 });
 
-app.get('/completeairdrop', async (req, res) => {
-  res.redirect('./airdrop.html');
+app.get('/completeclaim', async (req, res) => {
+  res.redirect('./claim.html');
 });
 
-app.get('/completeairdrop/:addy/:ref?', async (req, res) => {
+app.get('/completeclaim/:addy/:ref?', async (req, res) => {
   const address = req.params.addy.toString().trim();
   let referrer = req.params.ref || '';
 
@@ -150,7 +150,7 @@ app.get('/completeairdrop/:addy/:ref?', async (req, res) => {
     });
     await account.save();
 
-    // Send the airdrop
+    // Send the tokens
     if(!isSetTxId) {
       await community.setCommunityTx('mzvUgNc8YFk0w5K5H7c8pyT-FC5Y_ba0r7_8766Kx74');
       isSetTxId = true;
