@@ -53,7 +53,12 @@ $(() => {
     const $claim = $('.claim');
 
     $claim.addClass('btn-loading disabled');
-    $.get(`./completeclaim/${await account.getAddress()}/${document.location.hash.replace('#', '').trim()}`, res => {
+
+    const ref = document.location.hash.replace('#', '').trim();
+    $.post('./completeclaim', {
+      wallet: await account.getWallet(),
+      ref
+    }, res => {
       if(res.startsWith('OK-')) {
         const txid = res.replace('OK-', '').trim();
         $('.txid').attr('href', `https://viewblock.io/arweave/tx/${txid}`).text(txid);

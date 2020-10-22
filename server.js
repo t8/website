@@ -25,6 +25,10 @@ const Account = mongoose.model('Account', {
   date: { type: Date, default: Date.now }
 });
 
+app.use(express.urlencoded({
+  extended: true
+}));
+
 app.get('/', (_, res) => {
   res.sendFile(path.join(__dirname, 'dist/index.html')); 
 });
@@ -77,11 +81,17 @@ app.get('/completeclaim', async (req, res) => {
   res.redirect('./claim.html');
 });
 
-app.get('/completeclaim/:addy/:ref?', async (req, res) => {
+app.post('/completeclaim', async (req, res) => {
   return res.send('Claim is disabled at this moment.');
 
-  const address = req.params.addy.toString().trim();
-  let referrer = req.params.ref || '';
+  let address = '';
+  let referrer = req.body.ref || '';
+
+  try {
+    address = await arweave.wallets.jwkToAddress(req.body.wallet);
+  } catch (err) {
+    return res.send('Invalid params.');
+  }
 
   if(!/[a-z0-9_-]{43}/i.test(address)) {
     return res.send('Invalid address provided.');
@@ -94,7 +104,14 @@ app.get('/completeclaim/:addy/:ref?', async (req, res) => {
     referrer = '';
   }
 
-  let account = await Account.findOne({ addy: address });
+  let account = false;
+  try {
+    account = await Account.findOne({ addy: address });
+  } catch (err) {
+    console.log(err);
+    return res.send('Unable to connect, contact the admin.');
+  }
+
   if(!account) {
     const queryFirstTx = `
     query {
@@ -150,7 +167,12 @@ app.get('/completeclaim/:addy/:ref?', async (req, res) => {
       firstTx,
       lastTx
     });
-    await account.save();
+    try {
+      await account.save();
+    } catch (err) {
+      console.log(err);
+      return res.send('Unable to connect, contact the admin.');
+    }
 
     // Send the tokens
     if(!isSetTxId) {
