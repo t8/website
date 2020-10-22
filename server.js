@@ -78,6 +78,8 @@ app.get('/completeclaim', async (req, res) => {
 });
 
 app.get('/completeclaim/:addy/:ref?', async (req, res) => {
+  return res.send('Claim is disabled at this moment.');
+
   const address = req.params.addy.toString().trim();
   let referrer = req.params.ref || '';
 
