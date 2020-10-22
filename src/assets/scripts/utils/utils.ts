@@ -34,6 +34,33 @@ export default class Utils {
     }
   }
 
+  static formatBlocks(len: number = 720): string {
+    const hour = 30;
+    const day = 720;
+    const week = 720 * 7;
+    const month = week * 4;
+    const year = month * 12;
+
+    let res = '';
+    if(len >= year) {
+      const years = Math.round(len / year);
+      res = `~${years} ${years === 1 ? 'year' : 'years'}`;
+    } else if(len >= month) {
+      const months = Math.round(len / month);
+      res = `~${months} ${months === 1 ? 'month' : 'months'}`;
+    } else if(len >= day) {
+      const days = Math.round(len / day);
+      res = `~${days} ${days === 1 ? 'day' : 'days'}`;
+    } else if(len >= hour) {
+      const hours = Math.round(len / hour);
+      res = `~${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+    } else {
+      res = '<1 hour';
+    }
+
+    return res;
+  }
+
   static stripTags(str: any) {
     if(typeof str === 'object') {
       for(let key in str) {

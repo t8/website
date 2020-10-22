@@ -37,9 +37,25 @@ export default class PageDashboard {
   public async syncPageState() {
     const state = await app.getCommunity().getState();
 
+    console.log(state);
+    const commDesc = state.settings.get('communityDescription') || '';
+    const commAppUrl = state.settings.get('communityAppUrl') || '';
+
     $('.comm-title').text(state.name);
-    $('.comm-description').text(state.settings.get('communityDescription') || '');
-    $('.app-link').attr('src', state.settings.get('communityAppUrl') || '#!').text(state.settings.get('communityAppUrl') || '');
+    $('.comm-description').text(commDesc);
+    $('.app-link').attr('href', commAppUrl).text(commAppUrl);
+
+    const quorum = state.settings.get('quorum') * 100;
+    const support = state.settings.get('support') * 100;
+    const voteLength = state.settings.get('voteLength');
+    const lockMinLength = state.settings.get('lockMinLength');
+    const lockMaxLength = state.settings.get('lockMaxLength');
+
+    $('.quorum').text(` ${quorum}%`);
+    $('.support').text(` ${support}%`);
+    $('.voteLength').text(` ${voteLength} blocks (${Utils.formatBlocks(voteLength)})`);
+    $('.lockMinLength').text(` ${lockMinLength} blocks (${Utils.formatBlocks(lockMinLength)})`);
+    $('.lockMaxLength').text(` ${lockMaxLength} blocks (${Utils.formatBlocks(lockMaxLength)})`);
 
     const links = state.settings.get('communityDiscussionLinks');
     if(links && links.length) {
