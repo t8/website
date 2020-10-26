@@ -1,7 +1,6 @@
 import "quill/dist/quill.snow.css";
 
 import moment from "moment";
-import jdenticon from 'jdenticon';
 import jobboard from "./jobboard";
 import Utils from "../utils/utils";
 import Opportunity from "../models/opportunity";
@@ -97,17 +96,13 @@ export default class PageJobs {
         await comm.setCommunityTx(opp.community.id);
         const state = await comm.getState();
         console.log(state.settings);
-        // TODO: Show the user avatar or the community logo
-        let logo = '';
-        if(state.settings.has('communityLogo')) {
+        
+        let logo = state.settings.get('communityLogo');
+        if(logo && logo.length) {
           const config = arweave.api.getConfig();
-          logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`; 
+          logo = `${config.protocol}://${config.host}:${config.port}/${logo}`;
         } else {
-          const canvas = document.createElement('canvas');
-          canvas.width = 32;
-          canvas.height = 32;
-          jdenticon.drawIcon(canvas.getContext('2d'), opp.community.id, 32);
-          logo = canvas.toDataURL();
+          logo = Utils.generateIcon(opp.community.id, 32);
         }
         $job.find('.avatar').attr('style', `background-image: url(${logo})`);
       });

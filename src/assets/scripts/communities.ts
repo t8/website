@@ -1,5 +1,4 @@
 import "threads/register";
-import jdenticon from 'jdenticon';
 
 import "../styles/style.scss";
 import $ from './libs/jquery';
@@ -13,6 +12,7 @@ import { TokensWorker } from "./workers/tokens";
 import Author from "./models/author";
 import AuthorInterface from "./interfaces/author";
 import Opportunities from "./models/opportunities";
+import Utils from "./utils/utils";
 
 const getAllCommunityIds = async (): Promise<string[]> => {
   let cursor = '';
@@ -130,16 +130,12 @@ const loadCards = async () => {
 
     const oppsTotal = opps[commIds[i]]? opps[commIds[i]] : 0;
 
-    let logo = '';
-    if(state.settings.has('communityLogo')) {
+    let logo = state.settings.get('communityLogo');
+    if(logo && logo.length) {
       const config = arweave.api.getConfig();
-      logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`;
+      logo = `${config.protocol}://${config.host}:${config.port}/${logo}`;
     } else {
-      const canvas = document.createElement('canvas');
-      canvas.width = 72;
-      canvas.height = 72;
-      jdenticon.drawIcon(canvas.getContext('2d'), comm, 72);
-      logo = canvas.toDataURL();
+      logo = Utils.generateIcon(comm, 72);
     }
 
     const oppTxt = oppsTotal === 1? 'Opportunity' : 'Opportunities';

@@ -1,6 +1,6 @@
-import jdenticon from 'jdenticon';
 import AuthorInterface from "../interfaces/author";
 import communityDB from "../libs/db";
+import Utils from "../utils/utils";
 
 export default class Author {
   private _name: string;
@@ -34,12 +34,7 @@ export default class Author {
       }
       
       this._name = author.name || this._address;
-      
-      const canvas = document.createElement('canvas');
-      canvas.width = 32;
-      canvas.height = 32;
-      jdenticon.drawIcon(canvas.getContext('2d'), this._name, 32);
-      this._avatar = canvas.toDataURL();
+      this._avatar = Utils.generateIcon(this._name);
     }
 
     return {

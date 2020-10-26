@@ -1,4 +1,3 @@
-import jdenticon from 'jdenticon';
 import moment from "moment";
 import Community from "community-js";
 
@@ -72,16 +71,12 @@ export default class PageJob {
       const state = await comm.getState();
       console.log(state.settings);
       // TODO: Show the user avatar or the community logo
-      let logo = '';
-      if(state.settings.has('communityLogo')) {
+      let logo = state.settings.get('communityLogo');
+      if(logo && logo.length) {
         const config = arweave.api.getConfig();
-        logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`;  
+        logo = `${config.protocol}://${config.host}:${config.port}/${logo}`;
       } else {
-        const canvas = document.createElement('canvas');
-        canvas.width = 32;
-        canvas.height = 32;
-        jdenticon.drawIcon(canvas.getContext('2d'), this.opportunity.community.id, 32);
-        logo = canvas.toDataURL();
+        logo = Utils.generateIcon(this.opportunity.community.id, 32);
       }
       $('.community-logo').css('background-image', `url(${logo})`);
     });

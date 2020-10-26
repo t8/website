@@ -1,3 +1,5 @@
+import jdenticon from 'jdenticon';
+
 export default class Utils {
 
   static async pause(timeout: number = 500) {
@@ -69,6 +71,15 @@ export default class Utils {
     }
 
     return str;
+  }
+
+  static generateIcon(str: string, size: number = 32) {
+    const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      jdenticon.drawIcon(canvas.getContext('2d'), str, size);
+      
+      return canvas.toDataURL();
   }
 
   static stripHTML(str: string) {

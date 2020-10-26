@@ -1,5 +1,4 @@
 import { spawn, ModuleThread } from "threads";
-import jdenticon from 'jdenticon';
 
 import $ from '../libs/jquery';
 import { BalancesWorker } from "../workers/balances";
@@ -69,16 +68,12 @@ export default class PageDashboard {
       });
     }
 
-    let logo = '';
-    if(state.settings.get('communityLogo')) {
+    let logo = state.settings.get('communityLogo');
+    if(logo && logo.length) {
       const config = arweave.api.getConfig();
-      logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')})`;
+      logo = `${config.protocol}://${config.host}:${config.port}/${logo}`;
     } else {
-      const canvas = document.createElement('canvas');
-      canvas.width = 96;
-      canvas.height = 96;
-      jdenticon.drawIcon(canvas.getContext('2d'), app.getCommunityId(), 96);
-      logo = canvas.toDataURL();
+      logo = Utils.generateIcon(app.getCommunityId(), 96);
     }
     $('.comm-logo').css('background-image', `url(${logo})`);
 
