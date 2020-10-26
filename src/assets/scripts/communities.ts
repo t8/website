@@ -130,10 +130,16 @@ const loadCards = async () => {
 
     const oppsTotal = opps[commIds[i]]? opps[commIds[i]] : 0;
 
-    let avatar = '';
+    let logo = '';
     if(state.settings.has('communityLogo')) {
       const config = arweave.api.getConfig();
-      avatar = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`;
+      logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`;
+    } else {
+      const canvas = document.createElement('canvas');
+      canvas.width = 72;
+      canvas.height = 72;
+      jdenticon.drawIcon(canvas.getContext('2d'), comm, 72);
+      logo = canvas.toDataURL();
     }
 
     const oppTxt = oppsTotal === 1? 'Opportunity' : 'Opportunities';
@@ -143,7 +149,7 @@ const loadCards = async () => {
         <a class="card" href="./index.html#${comm}" data-community="${comm}" target="_blank">
           <div class="card-body text-center">
             <div class="mb-3">
-              <span class="avatar avatar-lg rounded" style="background-image: url(${avatar})"></span>
+              <span class="avatar avatar-lg rounded" style="background-image: url(${logo})"></span>
             </div>
             <h4 class="card-title m-0">${state.name} (${state.ticker})</h4>
             <div class="text-muted">${comm}</div>

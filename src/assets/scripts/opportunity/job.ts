@@ -1,11 +1,13 @@
+import jdenticon from 'jdenticon';
+import moment from "moment";
+import Community from "community-js";
+
 import jobboard from "./jobboard";
 import Utils from "../utils/utils";
-import moment from "moment";
 import Toast from "../utils/toast";
 import Opportunity from "../models/opportunity";
 import Applicant from "../models/applicant";
 import arweave from "../libs/arweave";
-import Community from "community-js";
 
 export default class PageJob {
   private opportunity: Opportunity;
@@ -73,14 +75,21 @@ export default class PageJob {
       let logo = '';
       if(state.settings.has('communityLogo')) {
         const config = arweave.api.getConfig();
-        logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`; 
-        $('.community-logo').css('background-image', `url(${logo})`);
+        logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`;  
+      } else {
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 32;
+        jdenticon.drawIcon(canvas.getContext('2d'), this.opportunity.community.id, 32);
+        logo = canvas.toDataURL();
       }
+      $('.community-logo').css('background-image', `url(${logo})`);
     });
     
 
     this.opportunity.author.getDetails().then((author) => {
       $('.creator-addy').attr('data-original-title', author.address).text(author.name || author.address);
+      // @ts-ignore
       $('[data-toggle="tooltip"]').tooltip();
       $('.creator-avatar').css('background-image', `url(${author.avatar})`);
     });
@@ -174,6 +183,7 @@ export default class PageJob {
     }
 
     $('.opp-applicants').html(html).parents('.dimmer').removeClass('active');
+    // @ts-ignore
     $('[data-toggle="tooltip"]').tooltip();
   }
 
@@ -195,6 +205,7 @@ export default class PageJob {
         return;
       }
 
+      // @ts-ignore
       $('#modal-apply').modal('show');
     });
 
@@ -228,6 +239,7 @@ export default class PageJob {
       }
 
       $(e.target).removeClass('btn-loading');
+      // @ts-ignore
       $('#modal-apply').modal('hide');
 
       jobboard.getStatusify().add('Application', tx.id);
@@ -248,6 +260,7 @@ export default class PageJob {
       $('#opp-update-status').prop('checked', false);
       $('#opp-app-id').val($(e.target).parents('.card').first().attr('data-applicant-id').trim());
       $('.tx-app-fee').text(jobboard.getFee());
+      // @ts-ignore
       $('#modal-applicant').modal('show');
     });
 
@@ -284,6 +297,7 @@ export default class PageJob {
       }
 
       $(e.target).removeClass('btn-loading');
+      // @ts-ignore
       $('#modal-applicant').modal('hide');
       $(`.card[data-applicant-id="${applicant.id}"]`).find('.card-status-top').addClass('bg-green')
       $(`.card[data-applicant-id="${applicant.id}"]`).find('.btn-applicant-approve').hide();
