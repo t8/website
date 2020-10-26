@@ -37,10 +37,10 @@ export default class PageDashboard {
   public async syncPageState() {
     const state = await app.getCommunity().getState();
 
-    console.log(state);
     const commDesc = state.settings.get('communityDescription') || '';
     const commAppUrl = state.settings.get('communityAppUrl') || '';
 
+    $('.commId').text(app.getCommunityId());
     $('.comm-title').text(state.name);
     $('.comm-description').text(commDesc);
     $('.app-link').attr('href', commAppUrl).text(commAppUrl);
