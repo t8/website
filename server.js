@@ -82,7 +82,9 @@ app.get('/completeclaim', async (req, res) => {
 });
 
 app.post('/completeclaim', async (req, res) => {
-  return res.send('Claim is disabled at this moment.');
+  if(!req.body || !req.body.wallet) {
+    return res.send('Invalid data.');
+  }
 
   let address = '';
   let referrer = req.body.ref || '';
