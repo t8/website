@@ -19,7 +19,8 @@ function copyToClipboard(str: string) {
   document.execCommand("copy");
   $temp.remove();
 
-  alert('Copied!');
+  const toast = new Toast();
+  toast.show('Copied', 'Link copied!', 'success', 1000);
 }
 
 // @ts-ignore
