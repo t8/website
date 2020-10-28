@@ -7,6 +7,7 @@ import Toast from "../utils/toast";
 import Opportunity from "../models/opportunity";
 import Applicant from "../models/applicant";
 import arweave from "../libs/arweave";
+import Market from "../models/market";
 
 export default class PageJob {
   private opportunity: Opportunity;
@@ -32,6 +33,11 @@ export default class PageJob {
   }
 
   async syncPageState() {
+    if(await jobboard.getAccount().isLoggedIn()) {
+      const market = new Market(this.opportunity.community.id, await jobboard.getAccount().getWallet());
+      market.showBuyButton();
+    }
+
     await this.opportunity.update();
 
     if(await jobboard.getAccount().isLoggedIn() && this.opportunity.author.address === await jobboard.getAccount().getAddress()) {
@@ -43,34 +49,34 @@ export default class PageJob {
       $('.is-not-owner').show();
       $('.btn-opp-status').addClass('disabled');
     }
-
+    
     $('.btn-opp-status').removeClass('btn-dark btn-danger').addClass('btn-primary').text(this.opportunity.status);
     switch(this.opportunity.status) {
       case 'Closed':
         $('.btn-opp-status').removeClass('btn-primary').addClass('disabled btn-danger');
         break;
-      case 'Finished':
-        $('.btn-opp-status').removeClass('btn-primary').addClass('disabled btn-dark');
-        break;
-    }
-
-    if(this.opportunity.status === 'Closed' || this.opportunity.status === 'Finished') {
-      $('.is-not-ended').hide();
-    } else {
-      $('.is-not-ended').show();
-    }
-
-    this.showApplicants();
-  }
+        case 'Finished':
+          $('.btn-opp-status').removeClass('btn-primary').addClass('disabled btn-dark');
+          break;
+        }
+        
+        if(this.opportunity.status === 'Closed' || this.opportunity.status === 'Finished') {
+          $('.is-not-ended').hide();
+        } else {
+          $('.is-not-ended').show();
+        }
+        
+        this.showApplicants();
+      }
 
   private async show() {
     await this.syncPageState();
 
     const comm = new Community(arweave);
+
     await comm.setCommunityTx(this.opportunity.community.id).then(async () => {
       const state = await comm.getState();
-      console.log(state.settings);
-      // TODO: Show the user avatar or the community logo
+      
       let logo = state.settings.get('communityLogo');
       if(logo && logo.length) {
         const config = arweave.api.getConfig();

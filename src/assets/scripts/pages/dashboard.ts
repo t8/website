@@ -6,6 +6,7 @@ import { VotesWorker } from "../workers/votes";
 import Utils from "../utils/utils";
 import app from "../app";
 import arweave from "../libs/arweave";
+import Market from "../models/market";
 
 export default class PageDashboard {
   // workers
@@ -35,6 +36,11 @@ export default class PageDashboard {
   }
 
   public async syncPageState() {
+    if(await app.getAccount().isLoggedIn()) {
+      const market = new Market(app.getCommunityId(), await app.getAccount().getWallet());
+      market.showBuyButton();
+    }
+
     const state = await app.getCommunity().getState();
 
     const commDesc = state.settings.get('communityDescription') || '';
