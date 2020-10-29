@@ -2058,10 +2058,19 @@ commander@^5.0.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-5.1.0.tgz#46abbd1652f8e059bddaef99bbdcb2ad9cf179ae"
   integrity sha512-P0CysNDQ7rtVw4QIQtm+MRxV66vKFSvlsQvGYXZWR3qFU0jlMKHZZZgw8e+8DSah4UDKMqnknRDQz+xuQXQ/Zg==
 
-community-js@^1.0.15, community-js@^1.1.2:
+community-js@^1.0.15:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/community-js/-/community-js-1.1.2.tgz#4eccf98d3e7da3d7fa6801d9eb8cc36ef1e4de8d"
   integrity sha512-8awLrFwgfONmRf0CYSjgOMotZk2YTwsUkTtEwlBNZtglpXlGLPtbgd9RL6MBBDFJDCgCv6c5LmM+EYkPJ+/S9Q==
+  dependencies:
+    arweave "^1.9.1"
+    smartweave "^0.3.x"
+    tiny-worker "^2.3.0"
+
+community-js@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/community-js/-/community-js-1.1.3.tgz#79953b25f8b8b9ad226a8dfd8d1e846fcdc92e6f"
+  integrity sha512-un7sgydu9Fei76waV30ePgS+ur2CffmX/4wYEJH3qYrQXS1dUDig92RJpGolqnk49WJRGJu4aUDrUVdSzp0jug==
   dependencies:
     arweave "^1.9.1"
     smartweave "^0.3.x"
