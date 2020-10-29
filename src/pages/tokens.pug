@@ -5,7 +5,9 @@
       .page-title 
 
     .col-auto.ml-auto.d-print-none
-      a.btn.btn-primary.d-none.d-sm-inline-block(href="#", data-toggle="modal", data-target="#modal-transfer")
+      +marketSellBtn(false)
+
+      a.btn.btn-primary.d-none.d-sm-inline-block.ml-1(href="#", data-toggle="modal", data-target="#modal-transfer")
         i.icon(data-feather="plus") 
         | Transfer tokens
       a.btn.btn-primary.d-sm-none.btn-icon(href="#", data-toggle="modal", data-target="#modal-transfer", aria-label="Transfer tokens")
@@ -91,3 +93,5 @@
           span.tx-fee
           | AR
       a.do-transfer-tokens.btn.btn-primary.ml-auto(href="#") Transfer tokens
+
+include partials/verto

@@ -90,9 +90,39 @@ export default class Market {
       const $btn = $(e);
       $btn.addClass($btn.hasClass('btn-block')? 'd-flex': '').removeClass('d-none').off('click').on('click', e => {
         e.preventDefault();
+
+        $('.tokens-btn').off('click').on('click', async e => {
+          e.preventDefault();
+          $(e.target).addClass('btn-loading');
+          await this.buyOrder();
+          $(e.target).removeClass('btn-loading');
+          // @ts-ignore
+          $('#verto-modal').modal('hide');
+        });
   
         // @ts-ignore
         $('#verto-modal').modal('show');
+      });
+    });
+  }
+
+  async showSellButton() {
+    $('.market-sell-btn').each((i, e) => {
+      const $btn = $(e);
+      $btn.addClass($btn.hasClass('btn-block')? 'd-flex' : '').removeClass('d-none').off('click').on('click', e => {
+        e.preventDefault();
+
+        $('.tokens-sell-btn').off('click').on('click', async e => {
+          e.preventDefault();
+          $(e.target).addClass('btn-loading');
+          await this.sellOrder();
+          $(e.target).removeClass('btn-loading');
+          // @ts-ignore
+          $('#verto-sell-modal').modal('hide');
+        });
+
+        // @ts-ignore
+        $('#verto-sell-modal').modal('show');
       });
     });
   }
@@ -101,6 +131,12 @@ export default class Market {
     // @ts-ignore
     $('#verto-modal').modal('hide');
     $('.market-btn').addClass('d-none').removeClass('d-flex').off('click');
+  }
+
+  async hideSellButton() {
+    // @ts-ignore
+    $('#verto-sell-modal').modal('hide');
+    $('.market-sell-btn').addClass('d-none').removeClass('d-flex').off('click');
   }
 
   async buyOrder() {
@@ -127,10 +163,37 @@ export default class Market {
       return;
     }
 
-    const r = await this.client.sendOrder(order.txs);
-    console.log(r);
+    await this.client.sendOrder(order.txs);
+    toast.show('Submitted', 'The order was successfully submitted.', 'success', 3000);
+    return true;
+  }
 
-    toast.show('Order created', 'The order was successfully created.', 'success', 3000);
+  async sellOrder() {
+    this.tradingPost = await this.client.recommendPost();
+    const amount = +$('#verto-sell-amount').val().toString().trim();
+    const rate = +$('#verto-sell-rate').val().toString().trim();
+    const toast = new Toast();
+
+    if(amount <= 0) {
+      toast.show('Error', 'Invalid sell order amount.', 'error', 3000);
+      return;
+    }
+    if(rate <= 0) {
+      toast.show('Error', 'Invalid sell order rate.', 'error', 3000);
+    }
+
+    const order = await this.client.createOrder('sell', amount, this.communityId, this.tradingPost, rate);
+    if(order === 'ar') {
+      toast.show('Error', 'You don\'t have enough AR to complete this order.', 'error', 3000);
+      return;
+    }
+    if(order === 'pst') {
+      toast.show('Error', 'You don\'t have enough tokens to complete this order', 'error', 3000);
+      return;
+    }
+
+    await this.client.sendOrder(order.txs);
+    toast.show('Submitted', 'The order was successfully submitted.', 'success', 3000);
     return true;
   }
 }

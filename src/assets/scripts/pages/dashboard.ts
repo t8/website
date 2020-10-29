@@ -36,9 +36,11 @@ export default class PageDashboard {
   }
 
   public async syncPageState() {
+    const market = new Market(app.getCommunityId(), await app.getAccount().getWallet());
     if(await app.getAccount().isLoggedIn()) {
-      const market = new Market(app.getCommunityId(), await app.getAccount().getWallet());
       market.showBuyButton();
+    } else {
+      market.hideBuyButton();
     }
 
     const state = await app.getCommunity().getState();

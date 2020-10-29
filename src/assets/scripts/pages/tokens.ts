@@ -9,6 +9,7 @@ import Utils from '../utils/utils';
 import Toast from '../utils/toast';
 import app from '../app';
 import Author from '../models/author';
+import Market from '../models/market';
 
 export default class PageTokens {
   private chart: ApexCharts;
@@ -43,6 +44,13 @@ export default class PageTokens {
   }
 
   public async syncPageState() {
+    const market = new Market(app.getCommunityId(), await app.getAccount().getWallet());
+    if(await app.getAccount().isLoggedIn()) {
+      market.showSellButton();
+    } else {
+      market.hideSellButton();
+    }
+
     const state = await app.getCommunity().getState();
 
     const {balance} = await this.balancesWorker.usersAndBalance(state.balances);

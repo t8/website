@@ -33,9 +33,11 @@ export default class PageJob {
   }
 
   async syncPageState() {
+    const market = new Market(this.opportunity.community.id, await jobboard.getAccount().getWallet());
     if(await jobboard.getAccount().isLoggedIn()) {
-      const market = new Market(this.opportunity.community.id, await jobboard.getAccount().getWallet());
       market.showBuyButton();
+    } else {
+      market.hideBuyButton();
     }
 
     await this.opportunity.update();
