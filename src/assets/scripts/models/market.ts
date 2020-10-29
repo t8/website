@@ -88,7 +88,7 @@ export default class Market {
 
     $('.market-btn').each((i, e) => {
       const $btn = $(e);
-      $btn.addClass($btn.hasClass('btn-block')? 'd-flex': '').removeClass('d-none').off('click').on('click', e => {
+      $btn.removeClass('disabled').off('click').on('click', e => {
         e.preventDefault();
 
         $('.tokens-btn').off('click').on('click', async e => {
@@ -109,7 +109,7 @@ export default class Market {
   async showSellButton() {
     $('.market-sell-btn').each((i, e) => {
       const $btn = $(e);
-      $btn.addClass($btn.hasClass('btn-block')? 'd-flex' : '').removeClass('d-none').off('click').on('click', e => {
+      $btn.removeClass('disabled').off('click').on('click', e => {
         e.preventDefault();
 
         $('.tokens-sell-btn').off('click').on('click', async e => {
@@ -130,13 +130,13 @@ export default class Market {
   async hideBuyButton() {
     // @ts-ignore
     $('#verto-modal').modal('hide');
-    $('.market-btn').addClass('d-none').removeClass('d-flex').off('click');
+    $('.market-btn').addClass('disabled').off('click');
   }
 
   async hideSellButton() {
     // @ts-ignore
     $('#verto-sell-modal').modal('hide');
-    $('.market-sell-btn').addClass('d-none').removeClass('d-flex').off('click');
+    $('.market-sell-btn').addClass('disabled').off('click');
   }
 
   async buyOrder() {
