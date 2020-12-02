@@ -212,7 +212,7 @@ $(async () => {
 
   $('.back').on('click', (e: any) => {
     e.preventDefault();
-    $(e.target).blur();
+    $(e.target).trigger('blur');
 
     if(!$(e.target).is('disabled') && currentStep > 1) {
       $(`.step${currentStep}`).fadeOut(() => {
@@ -233,7 +233,7 @@ $(async () => {
 
   $('.continue').on('click', async (e: any) => {
     e.preventDefault();
-    $(e.target).blur();
+    $(e.target).trigger('blur');
 
     if($(e.target).is('.btn-primary')) {
       currentStep++;
@@ -262,6 +262,10 @@ $(async () => {
     validate(e);
   });
 
+  $('#confirm, #aknowledge').on('change', e => {
+    validate(e);
+  });
+
   $('.add-holders').on('click', (e: any) => {
     e.preventDefault();
 
@@ -278,6 +282,7 @@ $(async () => {
     </tr>`);
   
   });
+
   $(document).on('input', '.input-number', (e: any) => {
     const $target = $(e.target);
     const newVal = +$target.val().toString().replace(/[^0-9]/g, '');
