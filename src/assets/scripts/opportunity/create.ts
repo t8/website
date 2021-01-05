@@ -1,13 +1,13 @@
-import "quill/dist/quill.snow.css";
+import 'quill/dist/quill.snow.css';
 import Quill from 'quill';
 import jobboard from './jobboard';
-import Utils from "../utils/utils";
+import Utils from '../utils/utils';
 import { OpportunityCommunityInterface } from '../interfaces/opportunity';
-import Transaction from "arweave/node/lib/transaction";
-import { StateInterface } from "community-js/lib/faces";
-import Community from "community-js";
-import Toast from "../utils/toast";
-import arweave from "../libs/arweave";
+import Transaction from 'arweave/node/lib/transaction';
+import { StateInterface } from 'community-js/lib/faces';
+import Community from 'community-js';
+import Toast from '../utils/toast';
+import arweave from '../libs/arweave';
 
 export default class PageCreateJob {
   private quill: Quill;
@@ -16,26 +16,26 @@ export default class PageCreateJob {
   private community: OpportunityCommunityInterface = {
     id: '',
     name: '',
-    ticker: ''
+    ticker: '',
   };
   private transferFee: number = 0;
 
   async open() {
-    if(!this.quill) {
+    if (!this.quill) {
       const toolbarOptions = [
-        [{ "header": [false, 2, 3, 4, 5, 6] }],
-        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+        [{ header: [false, 2, 3, 4, 5, 6] }],
+        ['bold', 'italic', 'underline', 'strike'], // toggled buttons
         ['blockquote', 'code-block', 'image', 'link'],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-        ['clean']                                         // remove formatting button
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+        ['clean'], // remove formatting button
       ];
 
       this.quill = new Quill('#quill-editor', {
         modules: {
-          toolbar: toolbarOptions
+          toolbar: toolbarOptions,
         },
-        theme: 'snow'
+        theme: 'snow',
       });
 
       $('.ql-editor').css('min-height', 150);
@@ -51,7 +51,7 @@ export default class PageCreateJob {
   }
 
   async syncPageState() {
-    if(!await jobboard.getAccount().isLoggedIn()) {
+    if (!(await jobboard.getAccount().isLoggedIn())) {
       window.location.hash = '';
     }
   }
@@ -79,7 +79,7 @@ export default class PageCreateJob {
 
     $target.prop('disabled', false).siblings('.input-icon-addon').hide();
 
-    if(!state || !this.community.name) {
+    if (!state || !this.community.name) {
       return;
     }
 
@@ -100,33 +100,33 @@ export default class PageCreateJob {
 
     const toast = new Toast();
 
-    if(title.length < 3) {
-      toast.show('Error', 'The title doesn\'t explain what is this opportunity.', 'error', 5000);
+    if (title.length < 3) {
+      toast.show('Error', "The title doesn't explain what is this opportunity.", 'error', 5000);
       return;
     }
 
-    if(!this.community.id || !await Utils.isArTx(this.community.id) || !this.community.name.length) {
+    if (!this.community.id || !(await Utils.isArTx(this.community.id)) || !this.community.name.length) {
       toast.show('Error', 'There seems to be an issue with your community ID. Please type it again.', 'error', 5000);
       return;
     }
 
-    if(!$(this.quill.root).text().trim().length) {
+    if (!$(this.quill.root).text().trim().length) {
       toast.show('Error', 'Description is required.', 'error', 5000);
       return;
     }
 
-    if(isNaN(amount) || amount < 1) {
+    if (isNaN(amount) || amount < 1) {
       toast.show('Error', 'Invalid payout amount.', 'error', 5000);
       return;
     }
 
-    if(isNaN(lockLength) || lockLength < 0) {
+    if (isNaN(lockLength) || lockLength < 0) {
       toast.show('Error', 'Invalid lock length.', 'error', 5000);
       return;
     }
 
     // Create the transaction
-    this.tx = await arweave.createTransaction({data: description}, await jobboard.getAccount().getWallet());
+    this.tx = await arweave.createTransaction({ data: description }, await jobboard.getAccount().getWallet());
     this.tx.addTag('Content-Type', 'text/html');
     this.tx.addTag('App-Name', 'CommunityXYZ');
     this.tx.addTag('Action', 'addOpportunity');
@@ -143,20 +143,19 @@ export default class PageCreateJob {
     this.tx.addTag('communityName', this.community.name);
     this.tx.addTag('communityTicker', this.community.ticker);
 
-    const cost = arweave.ar.winstonToAr(this.tx.reward, {formatted: true, decimals: 5, trim: true});
+    const cost = arweave.ar.winstonToAr(this.tx.reward, { formatted: true, decimals: 5, trim: true });
 
     this.transferFee = Math.round((amount * 2.5) / 100);
 
-    $('.fee').text((+cost) + (+jobboard.getFee()));
+    $('.fee').text(+cost + +jobboard.getFee());
     $('.comm-fee').text(`${this.transferFee} ${this.community.ticker}`);
     $('#confirm-modal').modal('show');
-
   }
 
   private async events() {
     $('#job-community').on('input', async (e: any) => {
       const val = $(e.target).val().toString().trim();
-      if(!await Utils.isArTx(val)) {
+      if (!(await Utils.isArTx(val))) {
         // @ts-ignore
         this.community = {};
         $('.community-name').text('');
@@ -188,20 +187,20 @@ export default class PageCreateJob {
 
       const state = await community.getState();
       const toast = new Toast();
-      
-      if(!state.balances || !state.balances[addy] || state.balances[addy] < this.transferFee) {
+
+      if (!state.balances || !state.balances[addy] || state.balances[addy] < this.transferFee) {
         $(e.target).removeClass('btn-loading');
-        toast.show('Error', 'You don\'t have enough Community balance for this transaction.', 'error', 5000);
+        toast.show('Error', "You don't have enough Community balance for this transaction.", 'error', 5000);
         return;
       }
 
-      if(await account.getArBalance() < +$('.fee').text()) {
+      if ((await account.getArBalance()) < +$('.fee').text()) {
         $(e.target).removeClass('btn-loading');
-        toast.show('Error', 'You don\'t have enough balance for this transaction.', 'error', 5000);
+        toast.show('Error', "You don't have enough balance for this transaction.", 'error', 5000);
         return;
       }
 
-      if(!await jobboard.chargeFee('addOpportunity')) {
+      if (!(await jobboard.chargeFee('addOpportunity'))) {
         $(e.target).removeClass('btn-loading');
         toast.show('Error', 'Error while trying to charge the fee for this transaction.', 'error', 5000);
         return;
@@ -214,7 +213,7 @@ export default class PageCreateJob {
       const target = await mainComm.selectWeightedHolder();
       mainComm = null;
 
-      if(target !== addy) {
+      if (target !== addy) {
         await community.setCommunityTx(this.community.id);
         await community.setWallet(await jobboard.getAccount().getWallet());
         await community.transfer(target, this.transferFee);
@@ -240,7 +239,7 @@ export default class PageCreateJob {
       $('[name="permission"]').first().click();
       this.quill.root.innerHTML = '';
       window.location.hash = txid;
-      
+
       jobboard.getStatusify().add('Add opportunity', txid);
     });
   }

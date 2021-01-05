@@ -1,15 +1,23 @@
-import OpportunityInterface, { OpportunityCommunityInterface, OpportunityType, OpportunityExpLevel, OpportunityCommitment, OpportunityProjectType, OpportunityPermission, OpportunityStatus } from "../interfaces/opportunity";
-import Utils from "../utils/utils";
-import { GQLTransactionsResultInterface, GQLEdgeInterface, GQLNodeInterface } from "../interfaces/gqlResult";
-import Arweave from "arweave";
-import Transaction from "arweave/node/lib/transaction";
-import Toast from "../utils/toast";
-import { OpportunitiesWorker } from "../workers/opportunities";
-import { spawn, Pool } from "threads";
-import Applicant from "./applicant";
-import Author from "./author";
-import communityDB from "../libs/db";
-import arweave from "../libs/arweave";
+import OpportunityInterface, {
+  OpportunityCommunityInterface,
+  OpportunityType,
+  OpportunityExpLevel,
+  OpportunityCommitment,
+  OpportunityProjectType,
+  OpportunityPermission,
+  OpportunityStatus,
+} from '../interfaces/opportunity';
+import Utils from '../utils/utils';
+import { GQLTransactionsResultInterface, GQLEdgeInterface, GQLNodeInterface } from '../interfaces/gqlResult';
+import Arweave from 'arweave';
+import Transaction from 'arweave/node/lib/transaction';
+import Toast from '../utils/toast';
+import { OpportunitiesWorker } from '../workers/opportunities';
+import { spawn, Pool } from 'threads';
+import Applicant from './applicant';
+import Author from './author';
+import communityDB from '../libs/db';
+import arweave from '../libs/arweave';
 
 export default class Opportunity implements OpportunityInterface {
   id?: string;
@@ -29,11 +37,11 @@ export default class Opportunity implements OpportunityInterface {
   updateTx: Transaction;
   timestamp: number;
   applicants: Applicant[];
-  
+
   constructor(params: OpportunityInterface) {
-    if(Object.keys(params).length) {
+    if (Object.keys(params).length) {
       params = Utils.stripTags(params);
-      for(let key in params) {
+      for (let key in params) {
         this[key] = params[key];
       }
     }
@@ -43,7 +51,7 @@ export default class Opportunity implements OpportunityInterface {
   }
 
   async getDescription(): Promise<string> {
-    if(!this.description) {
+    if (!this.description) {
       const res = await arweave.api.get(`/${this.id}`);
       this.description = Utils.escapeScriptStyles(res.data);
     }
@@ -51,8 +59,8 @@ export default class Opportunity implements OpportunityInterface {
     return this.description;
   }
 
-  async update(params?: {[key: string]: string}, caller?: any) {
-    if(params) {
+  async update(params?: { [key: string]: string }, caller?: any) {
+    if (params) {
       return this.doUpdate(params, caller);
     }
 
@@ -98,7 +106,7 @@ export default class Opportunity implements OpportunityInterface {
           }
         }
       }
-      `
+      `,
     };
 
     let txs: GQLTransactionsResultInterface;
@@ -112,12 +120,12 @@ export default class Opportunity implements OpportunityInterface {
       return;
     }
 
-    if(!txs.edges.length) {
+    if (!txs.edges.length) {
       return;
     }
 
-    for(let i = 0; i < txs.edges[0].node.tags.length; i++) {
-      if(txs.edges[0].node.tags[i].name === 'status') {
+    for (let i = 0; i < txs.edges[0].node.tags.length; i++) {
+      if (txs.edges[0].node.tags[i].name === 'status') {
         // @ts-ignore
         this.status = txs.edges[0].node.tags[i].value;
         break;
@@ -125,34 +133,34 @@ export default class Opportunity implements OpportunityInterface {
     }
   }
 
-  private async doUpdate(params: {[key: string]: string}, caller: any) {
+  private async doUpdate(params: { [key: string]: string }, caller: any) {
     $('.btn-opp-status').addClass('btn-loading');
 
     const keys = Object.keys(params);
-    if(!keys.length) {
+    if (!keys.length) {
       return false;
     }
 
-    const wallet =  await caller.getAccount().getWallet();
+    const wallet = await caller.getAccount().getWallet();
 
     const toast = new Toast();
-    if(this.author.address !== await caller.getAccount().getAddress()) {
+    if (this.author.address !== (await caller.getAccount().getAddress())) {
       toast.show('Error', 'You cannot edit this opportunity.', 'error', 5000);
       return false;
     }
 
-    if(!await caller.chargeFee('updateOpportunity')) {
+    if (!(await caller.chargeFee('updateOpportunity'))) {
       $('.btn-opp-status').removeClass('btn-loading');
       return false;
     }
 
     const tx = await arweave.createTransaction({ data: Math.random().toString().substr(-4) }, wallet);
-    
-    for(let i = 0; i < keys.length; i++) {
+
+    for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       tx.addTag(key, params[key]);
     }
-    
+
     tx.addTag('App-Name', 'CommunityXYZ');
     tx.addTag('Action', 'updateOpportunity');
     tx.addTag('Opportunity-ID', this.id);
@@ -178,7 +186,7 @@ export default class Opportunity implements OpportunityInterface {
 
     const oppTagStr = oppIds && oppIds.length ? `, {name: "communityId", values: ${JSON.stringify(oppIds)}}` : '';
 
-    while(hasNextPage) {
+    while (hasNextPage) {
       const query = {
         query: `
         query{
@@ -219,22 +227,22 @@ export default class Opportunity implements OpportunityInterface {
             }
           }
         }
-        `
+        `,
       };
-  
+
       let res: any;
       try {
         res = await arweave.api.request().post('https://arweave.dev/graphql', query);
       } catch (err) {
         console.log(err);
-        
+
         const toast = new Toast();
         toast.show('Error', 'Error connecting to the network.', 'error', 5000);
         return;
       }
-  
+
       const transactions: GQLTransactionsResultInterface = res.data.data.transactions;
-      if(transactions.edges && transactions.edges.length) {
+      if (transactions.edges && transactions.edges.length) {
         edges = edges.concat(transactions.edges);
         cursor = transactions.edges[transactions.edges.length - 1].cursor;
       }
@@ -244,8 +252,8 @@ export default class Opportunity implements OpportunityInterface {
 
     const pool = Pool(() => spawn<OpportunitiesWorker>(new Worker('../workers/opportunities.ts')), 8);
     let opps: Opportunity[] = [];
-    for(let i = 0, j = edges.length; i < j; i++) {
-      pool.queue(async oppsWorker => {
+    for (let i = 0, j = edges.length; i < j; i++) {
+      pool.queue(async (oppsWorker) => {
         const res = await oppsWorker.nodeToOpportunity(edges[i].node);
         try {
           communityDB.set(res.id, res);
@@ -265,10 +273,10 @@ export default class Opportunity implements OpportunityInterface {
     opps = await this.updateAll(opps);
 
     // get all applicants
-    const allApplicants = await Applicant.getAll(opps.map(opp => opp.id));
-    for(let i = 0, j = opps.length; i < j; i++) {
-      for(let k = 0, l = allApplicants.length; k < l; k++) {
-        if(opps[i].id === allApplicants[k].oppId) {
+    const allApplicants = await Applicant.getAll(opps.map((opp) => opp.id));
+    for (let i = 0, j = opps.length; i < j; i++) {
+      for (let k = 0, l = allApplicants.length; k < l; k++) {
+        if (opps[i].id === allApplicants[k].oppId) {
           opps[i].applicants.push(allApplicants[k]);
         }
       }
@@ -283,8 +291,8 @@ export default class Opportunity implements OpportunityInterface {
     let edges: GQLEdgeInterface[] = [];
     let cursor: string = '';
 
-    const ids = JSON.stringify(opps.map(opp => opp.id));
-    while(hasNextPage) {
+    const ids = JSON.stringify(opps.map((opp) => opp.id));
+    while (hasNextPage) {
       const query = {
         query: `
         query{
@@ -327,22 +335,22 @@ export default class Opportunity implements OpportunityInterface {
             }
           }
         }
-        `
+        `,
       };
-  
+
       let res: any;
       try {
         res = await arweave.api.request().post('https://arweave.dev/graphql', query);
       } catch (err) {
         console.log(err);
-        
+
         const toast = new Toast();
         toast.show('Error', 'Error connecting to the network.', 'error', 5000);
         return;
       }
-  
+
       const transactions: GQLTransactionsResultInterface = res.data.data.transactions;
-      if(transactions.edges && transactions.edges.length) {
+      if (transactions.edges && transactions.edges.length) {
         edges = edges.concat(transactions.edges);
         cursor = transactions.edges[transactions.edges.length - 1].cursor;
       }
@@ -351,12 +359,12 @@ export default class Opportunity implements OpportunityInterface {
     }
 
     const updates: Map<string, GQLNodeInterface> = new Map();
-    for(let i = 0, j = edges.length; i < j; i++) {
-      for(let j = 0; j < edges[i].node.tags.length; j++) {
+    for (let i = 0, j = edges.length; i < j; i++) {
+      for (let j = 0; j < edges[i].node.tags.length; j++) {
         const tag = edges[i].node.tags[j];
 
-        if(tag.name === 'Opportunity-ID') {
-          if(updates.has(tag.value)) {
+        if (tag.name === 'Opportunity-ID') {
+          if (updates.has(tag.value)) {
             break;
           }
           updates.set(tag.value, edges[i].node);
@@ -366,18 +374,18 @@ export default class Opportunity implements OpportunityInterface {
     }
 
     const tmpOpps: Opportunity[] = [];
-    for(let i = 0, j = opps.length; i < j; i++) {
+    for (let i = 0, j = opps.length; i < j; i++) {
       const opp = updates.get(opps[i].id);
-      if(opp) {
-        for(let k = 0; k < opp.tags.length; k++) {
-          if(opp.tags[k].name === 'status') {
+      if (opp) {
+        for (let k = 0; k < opp.tags.length; k++) {
+          if (opp.tags[k].name === 'status') {
             // @ts-ignore
             opps[i].status = opp.tags[k].value;
             break;
           }
         }
 
-        if(opps[i].status !== 'Closed' && opps[i].status !== 'Finished') {
+        if (opps[i].status !== 'Closed' && opps[i].status !== 'Finished') {
           tmpOpps.push(opps[i]);
         }
       } else {
@@ -390,7 +398,7 @@ export default class Opportunity implements OpportunityInterface {
 
   static async getOpportunity(opportunityId: string): Promise<Opportunity> {
     let res: OpportunityInterface = communityDB.get(opportunityId);
-    if(!res) {
+    if (!res) {
       const query = {
         query: `
         query{
@@ -411,7 +419,7 @@ export default class Opportunity implements OpportunityInterface {
             }
           }
         }
-        `
+        `,
       };
 
       let tx: GQLNodeInterface;
@@ -420,13 +428,13 @@ export default class Opportunity implements OpportunityInterface {
         tx = res.data.data.transaction;
       } catch (err) {
         console.log(err);
-        
+
         const toast = new Toast();
         toast.show('Error', 'Error connecting to the network.', 'error', 5000);
         return;
       }
-  
-      if(!tx) {
+
+      if (!tx) {
         return;
       }
 
@@ -441,8 +449,8 @@ export default class Opportunity implements OpportunityInterface {
 
     // get all applicants
     const allApplicants = await Applicant.getAll([opp.id]);
-    for(let k = 0, l = allApplicants.length; k < l; k++) {
-      if(opp.id === allApplicants[k].oppId) {
+    for (let k = 0, l = allApplicants.length; k < l; k++) {
+      if (opp.id === allApplicants[k].oppId) {
         opp.applicants.push(allApplicants[k]);
       }
     }

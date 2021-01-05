@@ -1,5 +1,5 @@
-import Opportunity from "./opportunity"
-import Arweave from "arweave";
+import Opportunity from './opportunity';
+import Arweave from 'arweave';
 
 export default class Opportunities {
   private oppsMap: Map<string, Opportunity> = new Map();
@@ -11,9 +11,9 @@ export default class Opportunities {
    */
   async getAll(): Promise<Opportunity[]> {
     // Check if there is only 1 opp loaded, if there is, load everything again to make sure it's right.
-    if(this.oppsMap.size < 2) {
+    if (this.oppsMap.size < 2) {
       this.oppsArr = await Opportunity.getAll();
-      for(let i = 0, j = this.oppsArr.length; i < j; i++) {
+      for (let i = 0, j = this.oppsArr.length; i < j; i++) {
         this.oppsMap.set(this.oppsArr[i].id, this.oppsArr[i]);
       }
     }
@@ -22,18 +22,18 @@ export default class Opportunities {
   }
 
   async getAllByCommunityIds(commIds: string[]): Promise<Opportunity[]> {
-    if(this.oppsMap.size < 2) {
+    if (this.oppsMap.size < 2) {
       this.oppsArr = await Opportunity.getAll(commIds);
-      for(let i = 0, j = this.oppsArr.length; i < j; i++) {
+      for (let i = 0, j = this.oppsArr.length; i < j; i++) {
         this.oppsMap.set(this.oppsArr[i].id, this.oppsArr[i]);
       }
 
       return this.oppsArr;
     }
-    
+
     const res: Opportunity[] = [];
-    for(let i = 0, j = this.oppsArr.length; i < j; i++) {
-      if(commIds.includes(this.oppsArr[i].community.id)) {
+    for (let i = 0, j = this.oppsArr.length; i < j; i++) {
+      if (commIds.includes(this.oppsArr[i].community.id)) {
         res.push(this.oppsArr[i]);
       }
     }
@@ -42,14 +42,14 @@ export default class Opportunities {
 
   async get(id: string, reload: boolean = false): Promise<Opportunity> {
     let opp = this.oppsMap.get(id);
-    if(!opp) {
+    if (!opp) {
       opp = await Opportunity.getOpportunity(id);
-      if(opp) {
+      if (opp) {
         this.oppsArr.push(opp);
         this.oppsMap.set(id, opp);
         this.oppsArr.sort((a, b) => b.timestamp - a.timestamp);
       }
-    } else if(reload) {
+    } else if (reload) {
       await opp.update();
       this.oppsMap.set(id, opp);
       this.oppsArr = Array.from(this.oppsMap.values());
@@ -66,10 +66,10 @@ export default class Opportunities {
    */
   async remove(id: string): Promise<Opportunity> {
     let removed: Opportunity = this.oppsMap.get(id);
-    if(removed) {
+    if (removed) {
       this.oppsMap.delete(id);
       this.oppsArr = Array.from(this.oppsMap.values());
-      this.oppsArr.sort((a,b) => b.timestamp - a.timestamp);
+      this.oppsArr.sort((a, b) => b.timestamp - a.timestamp);
     }
 
     return removed;

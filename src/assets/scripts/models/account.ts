@@ -1,12 +1,12 @@
-import { JWKInterface } from "arweave/web/lib/wallet";
+import { JWKInterface } from 'arweave/web/lib/wallet';
 
 import $ from '../libs/jquery';
 import Toast from '../utils/toast';
-import Community from "community-js";
-import arweave from "../libs/arweave";
-import communityDB from "../libs/db";
-import Author from "./author";
-import Dropbox from "../utils/dropbox";
+import Community from 'community-js';
+import arweave from '../libs/arweave';
+import communityDB from '../libs/db';
+import Author from './author';
+import Dropbox from '../utils/dropbox';
 
 export default class Account {
   private community: Community;
@@ -26,10 +26,10 @@ export default class Account {
   async init() {
     try {
       const sess = atob(communityDB.get('sesswall'));
-      if(sess) {
+      if (sess) {
         await this.loadWallet(JSON.parse(sess));
       }
-    } catch(e) {
+    } catch (e) {
       console.log(e);
     }
 
@@ -40,13 +40,13 @@ export default class Account {
   }
 
   async getArweaveId() {
-    return {name: this.username, address: this.address};
+    return { name: this.username, address: this.address };
   }
   async getAvatar(): Promise<string> {
     return this.avatar;
   }
   async isLoggedIn(): Promise<boolean> {
-    if(!this.isInitialized) {
+    if (!this.isInitialized) {
       await this.init();
     }
 
@@ -60,7 +60,11 @@ export default class Account {
   }
 
   async getArBalance(): Promise<number> {
-    this.arBalance = +arweave.ar.winstonToAr((await arweave.wallets.getBalance(this.address)), { formatted: true, decimals: 5, trim: true });
+    this.arBalance = +arweave.ar.winstonToAr(await arweave.wallets.getBalance(this.address), {
+      formatted: true,
+      decimals: 5,
+      trim: true,
+    });
     return this.arBalance;
   }
 
@@ -71,9 +75,9 @@ export default class Account {
 
   // Private methods
   private async initWallet() {
-    if($('.login-box').length) {
+    if ($('.login-box').length) {
       const deployer = new Dropbox($('.login-box'));
-      deployer.showLogin().then(async e => {
+      deployer.showLogin().then(async (e) => {
         await this.login(e);
         this.initWallet();
       });
@@ -83,19 +87,23 @@ export default class Account {
     this.wallet = wallet;
 
     this.address = await this.community.setWallet(wallet);
-    this.arBalance = +arweave.ar.winstonToAr((await arweave.wallets.getBalance(this.address)), { formatted: true, decimals: 5, trim: true });
+    this.arBalance = +arweave.ar.winstonToAr(await arweave.wallets.getBalance(this.address), {
+      formatted: true,
+      decimals: 5,
+      trim: true,
+    });
 
     const account = new Author(null, this.address, null);
-    const acc = await account.getDetails(); 
+    const acc = await account.getDetails();
     this.username = acc.name;
     this.avatar = acc.avatar;
 
     $('.user-name').text(this.username);
     $('.user-avatar').css('background-image', `url(${this.avatar})`);
 
-    if(this.address.length && this.arBalance >= 0) {
+    if (this.address.length && this.arBalance >= 0) {
       this.loggedIn = true;
-      if($('#login-modal').length) {
+      if ($('#login-modal').length) {
         // @ts-ignore
         $('#login-modal').modal('hide');
       }
@@ -108,26 +116,26 @@ export default class Account {
   }
 
   private async login(e: any) {
-    if(e.target && e.target.files) {
-      return new Promise(resolve => {
+    if (e.target && e.target.files) {
+      return new Promise((resolve) => {
         const fileReader = new FileReader();
         fileReader.onload = async (ev: any) => {
           await this.loadWallet(JSON.parse(fileReader.result.toString()));
-          
-          if(this.address.length && this.arBalance >= 0) {
+
+          if (this.address.length && this.arBalance >= 0) {
             let isError = false;
             try {
               communityDB.set('sesswall', btoa(fileReader.result.toString()));
-            } catch(err) {
+            } catch (err) {
               console.log(err);
               isError = true;
             }
-  
-            if(isError) {
+
+            if (isError) {
               try {
                 communityDB.clearAll();
                 resolve(this.login(e));
-              } catch(err) {
+              } catch (err) {
                 console.log(err);
               }
             }

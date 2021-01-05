@@ -1,5 +1,5 @@
-import Applicant from "../models/applicant";
-import Author from "../models/author";
+import Applicant from '../models/applicant';
+import Author from '../models/author';
 
 export interface OpportunityCommunityInterface {
   id: string;
@@ -25,7 +25,15 @@ export default interface OpportunityInterface {
   applicants: Applicant[];
 }
 
-export type OpportunityType = 'Bug' | 'Feature' | 'Improvement' | 'Security' | 'Documentation' | 'Design' | 'Code review' | 'Other';
+export type OpportunityType =
+  | 'Bug'
+  | 'Feature'
+  | 'Improvement'
+  | 'Security'
+  | 'Documentation'
+  | 'Design'
+  | 'Code review'
+  | 'Other';
 export type OpportunityExpLevel = 'Beginner' | 'Intermediate' | 'Advanced';
 export type OpportunityCommitment = 'Hours' | 'Days' | 'Weeks' | 'Months';
 export type OpportunityProjectType = 'Traditional' | 'Bounty' | 'Contest' | 'Cooperative'; // Traditional is deprecated

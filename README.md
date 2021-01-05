@@ -24,6 +24,14 @@ Starting from version 1.0.2 there's also permaweb versions stored forever on the
 Versions will be updated here as soon as a new one is created, by default it will be pointing to arweave().net but you can use any other gateway available for arweave().
 
 ```
+v1.0.12 - 
+- Single transaction for fee + contract call
+- Better description on each call
+- Prettier for Typescript
+
+v1.0.11 - https://arweave.net/UvRDOGKT-OrEI5AC9D9lMCuWqsWVvlXqNZfK690DKGA
+- Uses speedweave first release.
+
 v1.0.10 - https://arweave.dev/_pI6sdZF8IGckkdmnNtQ_JJDNiJEg5aPRJJNu2NCUD4
 - Global Arweave instance
 - Opps in each Community dashboard

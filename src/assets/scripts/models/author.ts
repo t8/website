@@ -1,6 +1,6 @@
-import AuthorInterface from "../interfaces/author";
-import communityDB from "../libs/db";
-import Utils from "../utils/utils";
+import AuthorInterface from '../interfaces/author';
+import communityDB from '../libs/db';
+import Utils from '../utils/utils';
 
 export default class Author {
   private _name: string;
@@ -19,20 +19,20 @@ export default class Author {
 
   async getDetails(): Promise<AuthorInterface> {
     // caching but for only 30 mins
-    if(!this._avatar) {
+    if (!this._avatar) {
       const res = communityDB.get(this._address);
       let author: any;
 
-      if(res) {
+      if (res) {
         author = res;
       } else {
-        author = {name: this.address, address: this.address};
+        author = { name: this.address, address: this.address };
         try {
           // @ts-ignore
-          communityDB.set(this._address, author, (new Date().getTime() + 30 * 60 * 1000));
-        } catch(e) {}
+          communityDB.set(this._address, author, new Date().getTime() + 30 * 60 * 1000);
+        } catch (e) {}
       }
-      
+
       this._name = author.name || this._address;
       this._avatar = Utils.generateIcon(this._name);
     }
@@ -40,7 +40,7 @@ export default class Author {
     return {
       name: this._name,
       address: this._address,
-      avatar: this._avatar
+      avatar: this._avatar,
     };
   }
 }

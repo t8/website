@@ -1,16 +1,17 @@
 import jdenticon from 'jdenticon';
 
 export default class Utils {
-
   static async pause(timeout: number = 500) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => resolve(), timeout);
     });
   }
 
   static async capitalize(str: string) {
     try {
-      str = str.replace(/([A-Z])/g, ' $1').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}); 
+      str = str.replace(/([A-Z])/g, ' $1').replace(/\w\S*/g, function (txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      });
     } catch (e) {}
 
     return str;
@@ -20,17 +21,27 @@ export default class Utils {
     return /^[a-z0-9-_]{43}$/i.test(str);
   }
 
-  static formatMoney(amount: number, decimalCount = 2, decimal = ".", thousands = ",") {
+  static formatMoney(amount: number, decimalCount = 2, decimal = '.', thousands = ',') {
     try {
       decimalCount = Math.abs(decimalCount);
       decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
-  
-      const negativeSign = amount < 0 ? "-" : "";
-  
+
+      const negativeSign = amount < 0 ? '-' : '';
+
       let i = parseInt((amount = Math.abs(Number(amount) || 0)).toFixed(decimalCount)).toString();
-      let j = (i.length > 3) ? i.length % 3 : 0;
-  
-      return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - (+i)).toFixed(decimalCount).slice(2) : "");
+      let j = i.length > 3 ? i.length % 3 : 0;
+
+      return (
+        negativeSign +
+        (j ? i.substr(0, j) + thousands : '') +
+        i.substr(j).replace(/(\d{3})(?=\d)/g, '$1' + thousands) +
+        (decimalCount
+          ? decimal +
+            Math.abs(amount - +i)
+              .toFixed(decimalCount)
+              .slice(2)
+          : '')
+      );
     } catch (e) {
       console.log(e);
     }
@@ -44,16 +55,16 @@ export default class Utils {
     const year = month * 12;
 
     let res = '';
-    if(len >= year) {
+    if (len >= year) {
       const years = Math.round(len / year);
       res = `~${years} ${years === 1 ? 'year' : 'years'}`;
-    } else if(len >= month) {
+    } else if (len >= month) {
       const months = Math.round(len / month);
       res = `~${months} ${months === 1 ? 'month' : 'months'}`;
-    } else if(len >= day) {
+    } else if (len >= day) {
       const days = Math.round(len / day);
       res = `~${days} ${days === 1 ? 'day' : 'days'}`;
-    } else if(len >= hour) {
+    } else if (len >= hour) {
       const hours = Math.round(len / hour);
       res = `~${hours} ${hours === 1 ? 'hour' : 'hours'}`;
     } else {
@@ -64,8 +75,8 @@ export default class Utils {
   }
 
   static stripTags(str: any) {
-    if(typeof str === 'object') {
-      for(let key in str) {
+    if (typeof str === 'object') {
+      for (let key in str) {
         str[this.stripTags(key)] = this.stripTags(str[key]);
       }
     }
@@ -75,11 +86,11 @@ export default class Utils {
 
   static generateIcon(str: string, size: number = 32) {
     const canvas = document.createElement('canvas');
-      canvas.width = size;
-      canvas.height = size;
-      jdenticon.drawIcon(canvas.getContext('2d'), str, size);
-      
-      return canvas.toDataURL();
+    canvas.width = size;
+    canvas.height = size;
+    jdenticon.drawIcon(canvas.getContext('2d'), str, size);
+
+    return canvas.toDataURL();
   }
 
   static stripHTML(str: string) {

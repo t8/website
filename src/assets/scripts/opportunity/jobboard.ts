@@ -1,20 +1,20 @@
-import "../../styles/style.scss";
+import '../../styles/style.scss';
 
-import "threads/register";
+import 'threads/register';
 import $ from '../libs/jquery';
-import "bootstrap/dist/js/bootstrap.bundle";
+import 'bootstrap/dist/js/bootstrap.bundle';
 
 import '../global';
-import PageJobs from "./jobs";
-import PageJob from "./job";
-import Account from "../models/account";
-import Community from "community-js";
-import PageCreateJob from "./create";
-import Transaction from "arweave/node/lib/transaction";
-import Statusify from "../utils/statusify";
-import Toast from "../utils/toast";
-import Opportunities from "../models/opportunities";
-import arweave from "../libs/arweave";
+import PageJobs from './jobs';
+import PageJob from './job';
+import Account from '../models/account';
+import Community from 'community-js';
+import PageCreateJob from './create';
+import Transaction from 'arweave/node/lib/transaction';
+import Statusify from '../utils/statusify';
+import Toast from '../utils/toast';
+import Opportunities from '../models/opportunities';
+import arweave from '../libs/arweave';
 
 class JobBoard {
   private hash: string;
@@ -23,7 +23,7 @@ class JobBoard {
   private account: Account;
   private statusify: Statusify;
   private opportunities: Opportunities;
-  
+
   private firstCall = true;
   private fee = '';
 
@@ -73,7 +73,7 @@ class JobBoard {
   }
 
   async init() {
-    if(!this.firstCall) {
+    if (!this.firstCall) {
       return;
     }
     this.firstCall = false;
@@ -81,7 +81,7 @@ class JobBoard {
     await this.updateFee();
     await this.account.init();
     $('body').fadeIn();
-    
+
     await this.pageChanged();
     this.events();
   }
@@ -95,10 +95,13 @@ class JobBoard {
     await this.community.setCommunityTx(await this.community.getMainContractId());
     const target = await this.community.selectWeightedHolder();
 
-    const tx: Transaction = await arweave.createTransaction({
-      target,
-      quantity: arweave.ar.arToWinston(this.fee)
-    }, await this.account.getWallet());
+    const tx: Transaction = await arweave.createTransaction(
+      {
+        target,
+        quantity: arweave.ar.arToWinston(this.fee),
+      },
+      await this.account.getWallet(),
+    );
 
     tx.addTag('App-Name', 'Community');
     tx.addTag('App-Version', '1.1.0');
@@ -117,7 +120,7 @@ class JobBoard {
   }
 
   private async updateFee() {
-    this.fee = await this.community.getActionCost(true, {formatted: true, decimals: 5, trim: true});
+    this.fee = await this.community.getActionCost(true, { formatted: true, decimals: 5, trim: true });
     $('.action-fee').text(this.fee);
 
     setTimeout(() => this.updateFee(), 60000);
@@ -129,7 +132,7 @@ class JobBoard {
 
     this.hashes = hashes;
 
-    if(updatePage) {
+    if (updatePage) {
       await this.pageChanged();
     }
   }
@@ -137,18 +140,18 @@ class JobBoard {
   private async pageChanged() {
     $('.dimmer').addClass('active');
 
-    if(this.currentPage) {
+    if (this.currentPage) {
       this.currentPage.close();
     }
-    
+
     let page = await this.getPageStr();
-    if(page === 'create' && !await this.account.isLoggedIn()) {
+    if (page === 'create' && !(await this.account.isLoggedIn())) {
       window.location.hash = '';
     }
 
-    if(page === 'home') {
+    if (page === 'home') {
       this.currentPage = this.pageJobs;
-    } else if(page === 'create') {
+    } else if (page === 'create') {
       this.currentPage = this.pageCreateJob;
     } else {
       this.currentPage = this.pageJob;
@@ -162,7 +165,7 @@ class JobBoard {
   }
 
   private async updateTxFee() {
-    const fee = await this.community.getActionCost(true, {formatted: true, decimals: 5, trim: true});
+    const fee = await this.community.getActionCost(true, { formatted: true, decimals: 5, trim: true });
     $('.tx-fee').text(fee);
 
     setTimeout(() => this.updateTxFee(), 60000);
@@ -175,10 +178,13 @@ class JobBoard {
 
     $(document).on('input', '.input-number', (e: any) => {
       const $target = $(e.target);
-      const newVal = +$target.val().toString().replace(/[^0-9]/g, '');
+      const newVal = +$target
+        .val()
+        .toString()
+        .replace(/[^0-9]/g, '');
       $target.val(newVal);
-  
-      if($target.hasClass('percent') && newVal > 99) {
+
+      if ($target.hasClass('percent') && newVal > 99) {
         $target.val(99);
       }
     });

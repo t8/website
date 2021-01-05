@@ -1,4 +1,4 @@
-import Author from "../models/author";
+import Author from '../models/author';
 
 export default interface ApplicantInterface {
   id: string;

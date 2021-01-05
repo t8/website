@@ -1,11 +1,11 @@
-import "quill/dist/quill.snow.css";
+import 'quill/dist/quill.snow.css';
 
-import moment from "moment";
-import jobboard from "./jobboard";
-import Utils from "../utils/utils";
-import Opportunity from "../models/opportunity";
-import Community from "community-js";
-import arweave from "../libs/arweave";
+import moment from 'moment';
+import jobboard from './jobboard';
+import Utils from '../utils/utils';
+import Opportunity from '../models/opportunity';
+import Community from 'community-js';
+import arweave from '../libs/arweave';
 
 export default class PageJobs {
   private opps: Opportunity[] = [];
@@ -22,7 +22,6 @@ export default class PageJobs {
     this.events();
   }
 
-  
   async close() {
     await this.removeEvents();
     $('.jobboard-jobs').hide();
@@ -48,23 +47,23 @@ export default class PageJobs {
     $('.bounty-type').find('[data-total="All"]').text(opps.length);
 
     let html = '';
-    for(let i = 0, j = opps.length; i < j; i++) {
+    for (let i = 0, j = opps.length; i < j; i++) {
       const opp = opps[i];
 
       const $type = $('.bounty-type').find(`[data-total="${opp.type}"]`);
-      $type.text((+$type.text()) + 1);
+      $type.text(+$type.text() + 1);
 
-      if(this.oppType !== 'All' && opp.type !== this.oppType) {
+      if (this.oppType !== 'All' && opp.type !== this.oppType) {
         continue;
       }
-      if(this.oppExp !== 'All' && opp.experience !== this.oppExp) {
+      if (this.oppExp !== 'All' && opp.experience !== this.oppExp) {
         continue;
       }
 
       const $exp = $('.exp-level').find(`[data-total="${opp.experience}"]`);
-      $exp.text((+$exp.text()) + 1);
+      $exp.text(+$exp.text() + 1);
       const $expTotal = $('.exp-level').find('[data-total="All"]');
-      $expTotal.text((+$expTotal.text()) + 1);
+      $expTotal.text(+$expTotal.text() + 1);
 
       html += `
       <a data-author="${opp.author.address}" data-opp-id="${opp.id}" class="jobs-job list-item" href="#${opp.id}">
@@ -77,11 +76,15 @@ export default class PageJobs {
               <li class="list-inline-item">${opp.type}</li>
               <li class="list-inline-item">${opp.experience}</li>
               <li class="list-inline-item">${moment(opp.timestamp).fromNow()}</li>
-              <li class="list-inline-item">${opp.applicants.length}&nbsp;${opp.applicants.length === 1? 'applicant': 'applicants'}</li>
+              <li class="list-inline-item">${opp.applicants.length}&nbsp;${
+        opp.applicants.length === 1 ? 'applicant' : 'applicants'
+      }</li>
             </ul>
           </small>
         </div>
-        <span class="list-item-actions text-dark show">${Utils.formatMoney(+opp.payout, 0)}&nbsp;${opp.community.ticker}</span>
+        <span class="list-item-actions text-dark show">${Utils.formatMoney(+opp.payout, 0)}&nbsp;${
+        opp.community.ticker
+      }</span>
       </a>`;
     }
 
@@ -91,32 +94,35 @@ export default class PageJobs {
       const $job = $(el);
       const oppId = $job.attr('data-opp-id');
 
-      jobboard.getOpportunities().get(oppId).then(async opp => {
-        const comm = new Community(arweave);
-        await comm.setCommunityTx(opp.community.id);
-        const state = await comm.getState();
-        console.log(state.settings);
-        
-        let logo = state.settings.get('communityLogo');
-        if(logo && logo.length) {
-          const config = arweave.api.getConfig();
-          logo = `${config.protocol}://${config.host}:${config.port}/${logo}`;
-        } else {
-          logo = Utils.generateIcon(opp.community.id, 32);
-        }
-        $job.find('.avatar').attr('style', `background-image: url(${logo})`);
-      });
+      jobboard
+        .getOpportunities()
+        .get(oppId)
+        .then(async (opp) => {
+          const comm = new Community(arweave);
+          await comm.setCommunityTx(opp.community.id);
+          const state = await comm.getState();
+          console.log(state.settings);
+
+          let logo = state.settings.get('communityLogo');
+          if (logo && logo.length) {
+            const config = arweave.api.getConfig();
+            logo = `${config.protocol}://${config.host}:${config.port}/${logo}`;
+          } else {
+            logo = Utils.generateIcon(opp.community.id, 32);
+          }
+          $job.find('.avatar').attr('style', `background-image: url(${logo})`);
+        });
     });
 
     $('.jobs-list').parents('.dimmer').removeClass('active');
   }
 
   private async events() {
-    $('.bounty-type').on('click', e => {
+    $('.bounty-type').on('click', (e) => {
       e.preventDefault();
 
       let $target = $(e.target);
-      if(!$target.is('.bounty-type')) {
+      if (!$target.is('.bounty-type')) {
         $target = $target.parents('.bounty-type').first();
       }
 
@@ -127,11 +133,11 @@ export default class PageJobs {
       this.oppType = $target.attr('data-type');
       return this.toHTML();
     });
-    $('.exp-level').on('click', e => {
+    $('.exp-level').on('click', (e) => {
       e.preventDefault();
 
       let $target = $(e.target);
-      if(!$target.is('.exp-level')) {
+      if (!$target.is('.exp-level')) {
         $target = $target.parents('.exp-level').first();
       }
 
@@ -142,14 +148,14 @@ export default class PageJobs {
       return this.toHTML();
     });
 
-    $('.btn-filters').on('click', e => {
+    $('.btn-filters').on('click', (e) => {
       e.preventDefault();
 
       $('.filters').toggleClass('d-none');
     });
 
-    $('.btn-create-opp').on('click', async e => {
-      if(!await jobboard.getAccount().isLoggedIn()) {
+    $('.btn-create-opp').on('click', async (e) => {
+      if (!(await jobboard.getAccount().isLoggedIn())) {
         e.preventDefault();
 
         await jobboard.getAccount().showLoginError();

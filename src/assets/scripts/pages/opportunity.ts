@@ -1,9 +1,9 @@
 import $ from '../libs/jquery';
-import app from "../app";
-import Opportunities from "../models/opportunities";
-import Utils from "../utils/utils";
-import moment from "moment";
-import Opportunity from "../models/opportunity";
+import app from '../app';
+import Opportunities from '../models/opportunities';
+import Utils from '../utils/utils';
+import moment from 'moment';
+import Opportunity from '../models/opportunity';
 import arweave from '../libs/arweave';
 
 export default class PageOpportunity {
@@ -40,25 +40,27 @@ export default class PageOpportunity {
 
     const state = await app.getCommunity().getState();
     let logo = '';
-    if(state.settings.get('communityLogo')) {
+    if (state.settings.get('communityLogo')) {
       const config = arweave.api.getConfig();
       logo = `${config.protocol}://${config.host}:${config.port}/${state.settings.get('communityLogo')}`;
     }
 
     let html = '';
-    for(let i = 0, j = opps.length; i < j; i++) {
+    for (let i = 0, j = opps.length; i < j; i++) {
       const opp = opps[i];
 
       const $type = $('.bounty-type').find(`[data-total="${opp.type}"]`);
-      $type.text((+$type.text()) + 1);
+      $type.text(+$type.text() + 1);
 
       const $exp = $('.exp-level').find(`[data-total="${opp.experience}"]`);
-      $exp.text((+$exp.text()) + 1);
+      $exp.text(+$exp.text() + 1);
       const $expTotal = $('.exp-level').find('[data-total="All"]');
-      $expTotal.text((+$expTotal.text()) + 1);
+      $expTotal.text(+$expTotal.text() + 1);
 
       html += `
-      <a data-author="${opp.author.address}" data-opp-id="${opp.id}" class="jobs-job list-item" href="./opportunity.html#${opp.id}" target="_blank">
+      <a data-author="${opp.author.address}" data-opp-id="${
+        opp.id
+      }" class="jobs-job list-item" href="./opportunity.html#${opp.id}" target="_blank">
         <span class="avatar rounded" style="background-image: url(${logo})"></span>
         <div>
           <span class="text-body d-block">${opp.title}</span>
@@ -68,16 +70,19 @@ export default class PageOpportunity {
               <li class="list-inline-item">${opp.type}</li>
               <li class="list-inline-item">${opp.experience}</li>
               <li class="list-inline-item">${moment(opp.timestamp).fromNow()}</li>
-              <li class="list-inline-item">${opp.applicants.length}&nbsp;${opp.applicants.length === 1? 'applicant': 'applicants'}</li>
+              <li class="list-inline-item">${opp.applicants.length}&nbsp;${
+        opp.applicants.length === 1 ? 'applicant' : 'applicants'
+      }</li>
             </ul>
           </small>
         </div>
-        <span class="list-item-actions text-dark show">${Utils.formatMoney(+opp.payout, 0)}&nbsp;${opp.community.ticker}</span>
+        <span class="list-item-actions text-dark show">${Utils.formatMoney(+opp.payout, 0)}&nbsp;${
+        opp.community.ticker
+      }</span>
       </a>`;
     }
 
     $('.jobs-list').html(html);
     $('.jobs-list').parents('.dimmer').removeClass('active');
   }
-
 }

@@ -1,9 +1,9 @@
-import Utils from "../utils/utils";
-import ApplicantInterface from "../interfaces/applicant";
-import { GQLNodeInterface, GQLTransactionsResultInterface } from "../interfaces/gqlResult";
-import Toast from "../utils/toast";
-import Author from "./author";
-import arweave from "../libs/arweave";
+import Utils from '../utils/utils';
+import ApplicantInterface from '../interfaces/applicant';
+import { GQLNodeInterface, GQLTransactionsResultInterface } from '../interfaces/gqlResult';
+import Toast from '../utils/toast';
+import Author from './author';
+import arweave from '../libs/arweave';
 
 export default class Applicant implements ApplicantInterface {
   id: string;
@@ -13,16 +13,16 @@ export default class Applicant implements ApplicantInterface {
   approved: boolean;
 
   constructor(params: ApplicantInterface) {
-    if(Object.keys(params).length) {
+    if (Object.keys(params).length) {
       params = Utils.stripTags(params);
-      for(let key in params) {
+      for (let key in params) {
         this[key] = params[key];
       }
     }
   }
 
   async getMessage(): Promise<string> {
-    if(!this.message) {
+    if (!this.message) {
       const res = await arweave.api.get(`/${this.id}`);
       this.message = Utils.escapeScriptStyles(res.data);
     }
@@ -30,13 +30,13 @@ export default class Applicant implements ApplicantInterface {
     return this.message;
   }
 
-  async update(params?: {[key: string]: string}, oppOwner?: string, caller?: any) {
-    if(params) {
+  async update(params?: { [key: string]: string }, oppOwner?: string, caller?: any) {
+    if (params) {
       return this.doUpdate(params, oppOwner, caller);
     }
 
     const owners = [this.author.address];
-    if(oppOwner) {
+    if (oppOwner) {
       owners.push(oppOwner);
     }
 
@@ -82,7 +82,7 @@ export default class Applicant implements ApplicantInterface {
           }
         }
       }
-      `
+      `,
     };
 
     let txs: GQLTransactionsResultInterface;
@@ -96,12 +96,12 @@ export default class Applicant implements ApplicantInterface {
       return;
     }
 
-    if(!txs.edges.length) {
+    if (!txs.edges.length) {
       return;
     }
 
-    for(let i = 0; i < txs.edges[0].node.tags.length; i++) {
-      if(txs.edges[0].node.tags[i].name === 'approved') {
+    for (let i = 0; i < txs.edges[0].node.tags.length; i++) {
+      if (txs.edges[0].node.tags[i].name === 'approved') {
         // @ts-ignore
         this.approved = txs.edges[0].node.tags[i].value === 'true';
         break;
@@ -109,39 +109,39 @@ export default class Applicant implements ApplicantInterface {
     }
   }
 
-  private async doUpdate(params: {[key: string]: string}, oppOwner: string, caller: any) {
+  private async doUpdate(params: { [key: string]: string }, oppOwner: string, caller: any) {
     const keys = Object.keys(params);
-    if(!keys.length) {
+    if (!keys.length) {
       return false;
     }
 
-    const wallet =  await caller.getAccount().getWallet();
+    const wallet = await caller.getAccount().getWallet();
     const toast = new Toast();
 
-    const isOwner = this.author.address !== await caller.getAccount().getAddress();
-    const isOppOwner = oppOwner !== await caller.getAccount().getAddress();
+    const isOwner = this.author.address !== (await caller.getAccount().getAddress());
+    const isOppOwner = oppOwner !== (await caller.getAccount().getAddress());
 
-    if(!isOwner || !isOppOwner) {
+    if (!isOwner || !isOppOwner) {
       toast.show('Error', 'You cannot update this applicant.', 'error', 3000);
       return false;
     }
 
-    if(params.approved && !isOppOwner) {
+    if (params.approved && !isOppOwner) {
       toast.show('Error', 'You cannot set this applicant as approved.', 'error', 3000);
       return false;
     }
 
-    if(!await caller.chargeFee('updateApplicant')) {
+    if (!(await caller.chargeFee('updateApplicant'))) {
       return false;
     }
 
     const tx = await arweave.createTransaction({ data: Math.random().toString().substr(-4) }, wallet);
-    
-    for(let i = 0; i < keys.length; i++) {
+
+    for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       tx.addTag(key, params[key]);
     }
-    
+
     tx.addTag('App-Name', 'CommunityXYZ');
     tx.addTag('Action', 'updateApplicant');
     tx.addTag('Applicant-ID', this.id);
@@ -198,7 +198,7 @@ export default class Applicant implements ApplicantInterface {
           }
         }
       }
-      `
+      `,
     };
 
     let txs: GQLTransactionsResultInterface;
@@ -213,7 +213,7 @@ export default class Applicant implements ApplicantInterface {
     }
 
     const res: Applicant[] = [];
-    for(let i = 0, j = txs.edges.length; i < j; i++) {
+    for (let i = 0, j = txs.edges.length; i < j; i++) {
       const applicant = await this.nodeToApplicant(txs.edges[i].node);
       res.push(applicant);
     }
@@ -224,7 +224,7 @@ export default class Applicant implements ApplicantInterface {
   static async nodeToApplicant(node: GQLNodeInterface): Promise<Applicant> {
     // Default object
     const objParams: any = {};
-    for(let i = 0, j = node.tags.length; i < j; i++) {
+    for (let i = 0, j = node.tags.length; i < j; i++) {
       objParams[Utils.stripTags(node.tags[i].name)] = Utils.stripTags(node.tags[i].value);
     }
 
@@ -232,7 +232,7 @@ export default class Applicant implements ApplicantInterface {
       id: node.id,
       author: new Author(node.owner.address, node.owner.address, null),
       message: null,
-      oppId: objParams['Opportunity-ID']
+      oppId: objParams['Opportunity-ID'],
     });
     return applicant;
   }

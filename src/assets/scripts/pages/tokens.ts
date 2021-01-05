@@ -22,7 +22,7 @@ export default class PageTokens {
   constructor() {}
 
   async open() {
-    if(this.firstCall) {
+    if (this.firstCall) {
       this.balancesWorker = await spawn<BalancesWorker>(new Worker('../workers/balances.ts'));
       this.tokensWorker = await spawn<TokensWorker>(new Worker('../workers/tokens.ts'));
 
@@ -45,7 +45,7 @@ export default class PageTokens {
 
   public async syncPageState() {
     const market = new Market(app.getCommunityId(), await app.getAccount().getWallet());
-    if(await app.getAccount().isLoggedIn()) {
+    if (await app.getAccount().isLoggedIn()) {
       market.showSellButton();
     } else {
       market.hideSellButton();
@@ -53,43 +53,53 @@ export default class PageTokens {
 
     const state = await app.getCommunity().getState();
 
-    const {balance} = await this.balancesWorker.usersAndBalance(state.balances);
-    const {vaultBalance} = await this.balancesWorker.vaultUsersAndBalance(state.vault);
+    const { balance } = await this.balancesWorker.usersAndBalance(state.balances);
+    const { vaultBalance } = await this.balancesWorker.vaultUsersAndBalance(state.vault);
 
     $('.ticker').text(state.ticker);
     $('.minted').text(Utils.formatMoney(balance + vaultBalance, 0));
     $('.minted').parents('.dimmer').removeClass('active');
-    
+
     const holdersByBalance = await this.tokensWorker.sortHoldersByBalance(state.balances, state.vault);
     this.createOrUpdateCharts(holdersByBalance);
     this.createOrUpdateTable(holdersByBalance, state);
 
-    const bal = await this.balancesWorker.getAddressBalance((await app.getAccount().getAddress()), state.balances, state.vault);
+    const bal = await this.balancesWorker.getAddressBalance(
+      await app.getAccount().getAddress(),
+      state.balances,
+      state.vault,
+    );
     $('.user-total-balance').text(Utils.formatMoney(bal.balance, 0));
     $('.user-unlocked-balance').text(Utils.formatMoney(bal.unlocked, 0));
 
-    const transferFee = await app.getCommunity().getActionCost(true, {formatted: true, decimals: 5, trim: true});
+    const transferFee = await app.getCommunity().getActionCost(true, { formatted: true, decimals: 5, trim: true });
     $('.tx-fee').text(` ${transferFee} `);
   }
 
-  private async createOrUpdateTable(holders: {
-    address: string;
-    balance: number;
-    vaultBalance: number;
-}[], state: StateInterface): Promise<void> {
+  private async createOrUpdateTable(
+    holders: {
+      address: string;
+      balance: number;
+      vaultBalance: number;
+    }[],
+    state: StateInterface,
+  ): Promise<void> {
     let html = '';
 
     $('#total-holders').text(`(${holders.length})`);
 
-    for(let i = 0, j = holders.length; i < j; i++) {
+    for (let i = 0, j = holders.length; i < j; i++) {
       const holder = holders[i];
       const acc = new Author(null, holder.address, null);
       const arId = await acc.getDetails();
       const avatar = arId.avatar;
-      const balance = holder.balance > holder.vaultBalance? holder.balance-holder.vaultBalance : holder.vaultBalance-holder.balance;
+      const balance =
+        holder.balance > holder.vaultBalance
+          ? holder.balance - holder.vaultBalance
+          : holder.vaultBalance - holder.balance;
 
       let role = '-';
-      if(holder.address in state.roles) {
+      if (holder.address in state.roles) {
         role = state.roles[holder.address];
       }
 
@@ -125,40 +135,40 @@ export default class PageTokens {
     $('.token-holders').find('tbody').html(html).parents('.dimmer').removeClass('active');
   }
 
-  private async createOrUpdateCharts(holders: {address: string, balance: number}[]) {
-    if(!this.chart) {
+  private async createOrUpdateCharts(holders: { address: string; balance: number }[]) {
+    if (!this.chart) {
       this.chart = new ApexCharts(document.getElementById('chart-total-tokens'), {
         chart: {
           type: 'donut',
           fontFamily: 'inherit',
           height: 216,
           sparkline: {
-            enabled: true
+            enabled: true,
           },
           animations: {
-            enabled: true
-          }
+            enabled: true,
+          },
         },
         fill: { opacity: 1 },
         title: {
-          text: 'Top holders'
+          text: 'Top holders',
         },
         labels: [],
         series: [],
-        noData: { 
-          text: 'Loading...'
+        noData: {
+          text: 'Loading...',
         },
         grid: {
-          strokeDashArray: 4
+          strokeDashArray: 4,
         },
-        colors: ["#206bc4", "#79a6dc", "#bfe399", "#e9ecf1"],
+        colors: ['#206bc4', '#79a6dc', '#bfe399', '#e9ecf1'],
         legend: { show: false },
         tooltip: { fillSeriesColor: false },
         yaxis: {
           labels: {
-            formatter: (val) => `${val}%`
-          }
-        }
+            formatter: (val) => `${val}%`,
+          },
+        },
       });
       this.chart.render();
     }
@@ -166,21 +176,21 @@ export default class PageTokens {
     const labels: string[] = [];
     const series: number[] = [];
 
-    const maxChartHolders = holders.length > 5? 5 : holders.length;
+    const maxChartHolders = holders.length > 5 ? 5 : holders.length;
 
     let totalBalance = 0;
-    for(let i = 0, j = holders.length; i < j; i++) {
+    for (let i = 0, j = holders.length; i < j; i++) {
       totalBalance += holders[i].balance;
     }
 
-    for(let i = 0, j = maxChartHolders; i < j; i++) {
-        labels.push(holders[i].address);
-        series.push(Math.round(holders[i].balance / totalBalance * 100));
+    for (let i = 0, j = maxChartHolders; i < j; i++) {
+      labels.push(holders[i].address);
+      series.push(Math.round((holders[i].balance / totalBalance) * 100));
     }
 
     this.chart.updateSeries(series);
     this.chart.updateOptions({
-      labels
+      labels,
     });
 
     $('#chart-total-tokens').parents('.dimmer').removeClass('active');
@@ -191,7 +201,11 @@ export default class PageTokens {
       e.preventDefault();
 
       const state = await app.getCommunity().getState();
-      const bal = await this.balancesWorker.getAddressBalance((await app.getAccount().getAddress()), state.balances, state.vault);
+      const bal = await this.balancesWorker.getAddressBalance(
+        await app.getAccount().getAddress(),
+        state.balances,
+        state.vault,
+      );
 
       $('.input-max-balance').val(bal.unlocked);
     });
@@ -199,21 +213,21 @@ export default class PageTokens {
     $('.do-transfer-tokens').on('click', async (e: any) => {
       e.preventDefault();
 
-      if(!await app.getAccount().isLoggedIn()) {
+      if (!(await app.getAccount().isLoggedIn())) {
         $('#modal-transfer').modal('hide');
         return app.getAccount().showLoginError();
       }
 
       const $target = $('#transfer-target');
       const $balance = $('#transfer-balance');
-      if($target.hasClass('is-invalid') || $balance.hasClass('is-invalid')) {
+      if ($target.hasClass('is-invalid') || $balance.hasClass('is-invalid')) {
         return;
       }
 
       const transferTarget = $target.val().toString().trim();
       const transferBalance = +$balance.val().toString().trim();
 
-      if(isNaN(transferBalance) || transferBalance < 1 || !Number.isInteger(transferBalance)) {
+      if (isNaN(transferBalance) || transferBalance < 1 || !Number.isInteger(transferBalance)) {
         return;
       }
 
@@ -221,11 +235,13 @@ export default class PageTokens {
 
       try {
         const txid = await app.getCommunity().transfer(transferTarget, transferBalance);
-        app.getStatusify().add('Transfer balance', txid)
-        .then(async () => {
-          await app.getCommunity().getState(false);
-          app.getCurrentPage().syncPageState();
-        });
+        app
+          .getStatusify()
+          .add('Transfer balance', txid)
+          .then(async () => {
+            await app.getCommunity().getState(false);
+            app.getCurrentPage().syncPageState();
+          });
       } catch (err) {
         console.log(err.message);
         const toast = new Toast();
@@ -239,7 +255,7 @@ export default class PageTokens {
     $('#transfer-target').on('input', async (e: any) => {
       const $target = $(e.target);
       const transferTarget = $target.val().toString().trim();
-      if(!(await Utils.isArTx(transferTarget)) || transferTarget === (await app.getAccount().getAddress())) {
+      if (!(await Utils.isArTx(transferTarget)) || transferTarget === (await app.getAccount().getAddress())) {
         $target.addClass('is-invalid');
       } else {
         $target.removeClass('is-invalid');
@@ -259,14 +275,14 @@ export default class PageTokens {
       e.preventDefault();
 
       const addy = $(e.target).parent().attr('data-addy').trim();
-      
-      if($(e.target).hasClass('mint-user')) {
+
+      if ($(e.target).hasClass('mint-user')) {
         $('input[name="voteType"][value="mint"]').trigger('click');
         $('#vote-recipient').val(addy);
-      } else if($(e.target).hasClass('mint-locked-user')) {
+      } else if ($(e.target).hasClass('mint-locked-user')) {
         $('input[name="voteType"][value="mintLocked"]').trigger('click');
         $('#vote-recipient').val(addy);
-      } else if($(e.target).hasClass('burn-vault-user')) {
+      } else if ($(e.target).hasClass('burn-vault-user')) {
         $('input[name="voteType"][value="burnVault"]').trigger('click');
         $('#vote-target').val(addy);
       }

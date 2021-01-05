@@ -1,22 +1,22 @@
-import "../styles/style.scss";
+import '../styles/style.scss';
 
 import Community from 'community-js';
 import $ from './libs/jquery';
-import "bootstrap/dist/js/bootstrap.bundle";
+import 'bootstrap/dist/js/bootstrap.bundle';
 
 import './global';
-import Account from "./models/account";
-import arweave from "./libs/arweave";
-import Toast from "./utils/toast";
+import Account from './models/account';
+import arweave from './libs/arweave';
+import Toast from './utils/toast';
 
 const community = new Community(arweave);
 const account = new Account(community);
 
 function copyToClipboard(str: string) {
-  const $temp = $("<input>");
-  $("body").append($temp);
+  const $temp = $('<input>');
+  $('body').append($temp);
   $temp.val(str).select();
-  document.execCommand("copy");
+  document.execCommand('copy');
   $temp.remove();
 
   const toast = new Toast();
@@ -24,16 +24,16 @@ function copyToClipboard(str: string) {
 }
 
 // @ts-ignore
-window.currentPage = { 
+window.currentPage = {
   syncPageState: async () => {
-    if(await account.isLoggedIn()) {
+    if (await account.isLoggedIn()) {
       $('.logged-in-addy').text(await account.getAddress());
       $('.ref-link').text(`https://community.xyz/claim#${await account.getAddress()}`);
       $('.logged-in').show();
     } else {
       $('.logged-out').hide();
     }
-  }
+  },
 };
 
 $(() => {
@@ -41,13 +41,13 @@ $(() => {
   $('a.create').attr('href', './create.html');
   $('a.opp').attr('href', './opportunity.html');
   $('a.comms').attr('href', './communities.html');
-  $('a.ref-link').on('click', e => {
+  $('a.ref-link').on('click', (e) => {
     e.preventDefault();
 
     copyToClipboard($('a.ref-link').text().toString().trim());
   });
 
-  $('.claim').on('click', async e => {
+  $('.claim').on('click', async (e) => {
     e.preventDefault();
 
     const toast = new Toast();
@@ -56,26 +56,30 @@ $(() => {
     $claim.addClass('btn-loading disabled');
 
     const ref = document.location.hash.replace('#', '').trim();
-    $.post('./completeclaim', {
-      wallet: await account.getWallet(),
-      ref
-    }, res => {
-      if(res.startsWith('OK-')) {
-        const txid = res.replace('OK-', '').trim();
-        $('.txid').attr('href', `https://viewblock.io/arweave/tx/${txid}`).text(txid);
-        
-        $claim.hide();
-        $('.confirmed').show();
+    $.post(
+      './completeclaim',
+      {
+        wallet: await account.getWallet(),
+        ref,
+      },
+      (res) => {
+        if (res.startsWith('OK-')) {
+          const txid = res.replace('OK-', '').trim();
+          $('.txid').attr('href', `https://viewblock.io/arweave/tx/${txid}`).text(txid);
 
-        toast.show('Claimed', 'Tokens claimed!', 'success', 3000);
-      } else if(res === 'DONE') {
-        toast.show('Error', 'Tokens already claimed!', 'error', 3000);
-      } else {
-        toast.show('Error', res, 'error', 3000);
-      }
+          $claim.hide();
+          $('.confirmed').show();
 
-      $claim.removeClass('disabled btn-loading');
-    });
+          toast.show('Claimed', 'Tokens claimed!', 'success', 3000);
+        } else if (res === 'DONE') {
+          toast.show('Error', 'Tokens already claimed!', 'error', 3000);
+        } else {
+          toast.show('Error', res, 'error', 3000);
+        }
+
+        $claim.removeClass('disabled btn-loading');
+      },
+    );
   });
 
   account.init();

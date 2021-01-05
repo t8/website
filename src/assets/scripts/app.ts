@@ -1,19 +1,19 @@
-import "../styles/board.scss";
+import '../styles/board.scss';
 
-import "threads/register";
+import 'threads/register';
 import Community from 'community-js';
 import $ from './libs/jquery';
-import "bootstrap/dist/js/bootstrap.bundle";
+import 'bootstrap/dist/js/bootstrap.bundle';
 
 import './global';
-import PageDashboard from "./pages/dashboard";
-import PageTokens from "./pages/tokens";
-import PageVotes from "./pages/votes";
-import PageVault from "./pages/vault";
-import Account from "./models/account";
-import Statusify from "./utils/statusify";
-import PageOpportunity from "./pages/opportunity";
-import arweave from "./libs/arweave";
+import PageDashboard from './pages/dashboard';
+import PageTokens from './pages/tokens';
+import PageVotes from './pages/votes';
+import PageVault from './pages/vault';
+import Account from './models/account';
+import Statusify from './utils/statusify';
+import PageOpportunity from './pages/opportunity';
+import arweave from './libs/arweave';
 
 class App {
   private hash: string;
@@ -24,7 +24,7 @@ class App {
   private currentBlock: number = 0;
 
   private firstCall = true;
-  
+
   // Pages`
   private currentPage: PageDashboard | PageTokens | PageVotes | PageVault | PageOpportunity; // Add all possible page objects here
   private pageDashboard: PageDashboard;
@@ -85,7 +85,7 @@ class App {
   }
 
   async init() {
-    if(!this.firstCall) {
+    if (!this.firstCall) {
       return;
     }
     this.firstCall = false;
@@ -96,7 +96,7 @@ class App {
 
     $('.navbar-brand').attr('href', '/index.html');
     $('body').show();
-    
+
     await this.updateLinks();
     await this.pageChanged();
     await this.account.init();
@@ -134,33 +134,33 @@ class App {
           }
         }
       }
-      `
+      `,
     };
 
     const res = await arweave.api.request().post('https://arweave.dev/graphql', query);
-    if(!res.data || !res.data.data) {
+    if (!res.data || !res.data.data) {
       return;
     }
 
     let contracts = [];
     const communityTags = res.data.data.community.tags;
     const mainTags = res.data.data.main.tags;
-    
-    for(let i = 0; i < communityTags.length; i++) {
-      if(communityTags[i].name === 'Contract-Src') {
+
+    for (let i = 0; i < communityTags.length; i++) {
+      if (communityTags[i].name === 'Contract-Src') {
         contracts.push(communityTags[i].value);
         break;
       }
     }
 
-    for(let i = 0; i < mainTags.length; i++) {
-      if(mainTags[i].name === 'Contract-Src') {
+    for (let i = 0; i < mainTags.length; i++) {
+      if (mainTags[i].name === 'Contract-Src') {
         contracts.push(mainTags[i].value);
         break;
       }
     }
 
-    if(contracts[0] === contracts[1]) {
+    if (contracts[0] === contracts[1]) {
       return;
     }
 
@@ -173,29 +173,31 @@ class App {
   }
 
   private async updateLinks() {
-    $('a').not('[data-toggle]').each((i: number, e: Element) => {
-      const link = $(e).attr('href').split('#');
-      if(link.length > 1 && link[1] !== '!' && !link[1].startsWith(this.hashes[0])) {
-        $(e).attr('href', `#${this.hashes[0]}${link[1]}`);
-      }
-    });
+    $('a')
+      .not('[data-toggle]')
+      .each((i: number, e: Element) => {
+        const link = $(e).attr('href').split('#');
+        if (link.length > 1 && link[1] !== '!' && !link[1].startsWith(this.hashes[0])) {
+          $(e).attr('href', `#${this.hashes[0]}${link[1]}`);
+        }
+      });
   }
 
   private async hashChanged(updatePage = true) {
     this.hash = location.hash.substr(1);
     const hashes = this.hash.split('/');
-    if(this.hashes && this.hashes[0] !== hashes[0]) {
+    if (this.hashes && this.hashes[0] !== hashes[0]) {
       window.location.reload();
     }
 
     this.hashes = hashes;
-    
+
     // To be able to access the dashboard, you need to send a Community txId.
-    if(!this.hashes.length || !(/^[a-z0-9-_]{43}$/i.test(this.hashes[0]))) {
+    if (!this.hashes.length || !/^[a-z0-9-_]{43}$/i.test(this.hashes[0])) {
       window.location.href = './home.html';
     }
 
-    if(updatePage) {
+    if (updatePage) {
       await this.pageChanged();
     }
   }
@@ -203,20 +205,20 @@ class App {
   private async pageChanged() {
     $('.dimmer').addClass('active');
 
-    if(this.currentPage) {
+    if (this.currentPage) {
       this.currentPage.close();
     }
 
     const page = await this.getPageStr();
-    if(page === 'home') {
+    if (page === 'home') {
       this.currentPage = this.pageDashboard;
-    } else if(page === 'tokens') {
+    } else if (page === 'tokens') {
       this.currentPage = this.pageTokens;
-    } else if(page === 'votes') {
+    } else if (page === 'votes') {
       this.currentPage = this.pageVotes;
-    } else if(page === 'vault') {
+    } else if (page === 'vault') {
       this.currentPage = this.pageVault;
-    } else if(page === 'opportunity') {
+    } else if (page === 'opportunity') {
       this.currentPage = this.pageOpportunity;
     }
 
@@ -231,7 +233,7 @@ class App {
   }
 
   private async updateTxFee() {
-    const fee = await this.community.getActionCost(true, {formatted: true, decimals: 5, trim: true});
+    const fee = await this.community.getActionCost(true, { formatted: true, decimals: 5, trim: true });
     $('.tx-fee').text(fee);
 
     setTimeout(() => this.updateTxFee(), 60000);
@@ -244,21 +246,27 @@ class App {
 
     $(document).on('input', '.input-number', (e: any) => {
       const $target = $(e.target);
-      const newVal = +$target.val().toString().replace(/[^0-9]/g, '');
+      const newVal = +$target
+        .val()
+        .toString()
+        .replace(/[^0-9]/g, '');
       $target.val(newVal);
-  
-      if($target.hasClass('percent') && newVal > 99) {
+
+      if ($target.hasClass('percent') && newVal > 99) {
         $target.val(99);
       }
     });
 
     $(document).on('input', '.input-float', (e: any) => {
       const $target = $(e.target);
-      const newVal = +$target.val().toString().replace(/[^0-9\.]/g, '');
+      const newVal = +$target
+        .val()
+        .toString()
+        .replace(/[^0-9\.]/g, '');
       $target.val(newVal);
-  
+
       // Needed?
-      if($target.hasClass('percent') && newVal >= 100) {
+      if ($target.hasClass('percent') && newVal >= 100) {
         $target.val(100);
       }
     });

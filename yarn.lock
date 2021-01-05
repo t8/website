@@ -2088,14 +2088,14 @@ community-js@^1.0.15:
     smartweave "^0.3.x"
     tiny-worker "^2.3.0"
 
-community-js@^1.1.8:
-  version "1.1.8"
-  resolved "https://registry.yarnpkg.com/community-js/-/community-js-1.1.8.tgz#7b81263a9e121b258798f72ee04d9b1f77fa9f97"
-  integrity sha512-ZJE7Z8COFRc/tJ93lUTTW1Z384PBB54p559cB1eI4C9CsqmXArwezmatv3sr/KsRCRNBpJE2l5S2kAkIpem0Tg==
+community-js@^1.1.14:
+  version "1.1.14"
+  resolved "https://registry.yarnpkg.com/community-js/-/community-js-1.1.14.tgz#ce5dea061cee8cb87810f7f578b51a45c1353210"
+  integrity sha512-EiCqYCdjcdkXBX+A2uhjBRslvoZv9c+CDIgrLUi9UO+DOdeKd9I2Yz/j7JoAiF9549z+upUUJaoGwcfTk10kdA==
   dependencies:
     arweave "^1.9.1"
     axios "^0.21.0"
-    smartweave "^0.4.11"
+    smartweave "^0.4.21"
     tiny-worker "^2.3.0"
 
 component-emitter@^1.2.1:
@@ -5502,6 +5502,11 @@ prelude-ls@~1.1.2:
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
   integrity sha1-IZMqVJ9eUv/ZqCf1cOBL5iqX2lQ=
 
+prettier@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.2.1.tgz#795a1a78dd52f073da0cd42b21f9c91381923ff5"
+  integrity sha512-PqyhM2yCjg/oKkFPtTGUojv7gnZAoG80ttl45O6x2Ug/rMJw4wcc9k6aaf2hibP7BGVCCM33gZoGjyvt9mm16Q==
+
 process-nextick-args@~2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
@@ -6197,10 +6202,10 @@ smartweave@^0.3.6, smartweave@^0.3.x:
     loglevel "^1.7.0"
     yargs "^15.3.1"
 
-smartweave@^0.4.11:
-  version "0.4.11"
-  resolved "https://registry.yarnpkg.com/smartweave/-/smartweave-0.4.11.tgz#847cc736f1b15f425059407e1a654a49a16893f7"
-  integrity sha512-y/tcaWh9Uq6qPzIpqLadsxjR6GoeFU2no8KoQ8ycQgQbrcGKm7hQGghWNOknPzX+qaoF/xEA73hkAewyKM9Tpw==
+smartweave@^0.4.21:
+  version "0.4.21"
+  resolved "https://registry.yarnpkg.com/smartweave/-/smartweave-0.4.21.tgz#2c40e0faf4d45f67f32367b88b3fa39a29faa1bc"
+  integrity sha512-DgNdYzCeG6YEeG2Cxg7Bqvgkgii7PVR+Ni53MZ/Oflv9EWu/YNnnXvu5KpoveSfkNHDX7TYZL1iLnjVy9jLkZA==
   dependencies:
     "@weavery/clarity" "^0.1.5"
     arweave "^1.9.1"

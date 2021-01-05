@@ -1,4 +1,4 @@
-import "bootstrap/dist/js/bootstrap.bundle";
+import 'bootstrap/dist/js/bootstrap.bundle';
 import feather from 'feather-icons';
 
 import $ from '../libs/jquery';
@@ -12,10 +12,10 @@ export default class Toast {
   show(title: string, message: string, type: 'error' | 'success' | 'none' | 'login', duration: number = 500) {
     const autohide: boolean = duration > 0;
 
-    const bg = type === 'error' || type === 'login'? 'bg-red' : (type === 'success' ? 'bg-green' : 'bg-yellow');
+    const bg = type === 'error' || type === 'login' ? 'bg-red' : type === 'success' ? 'bg-green' : 'bg-yellow';
 
     let icon = '<div class="spinner-border spinner-border-sm" role="status"></div>';
-    switch(type) {
+    switch (type) {
       case 'error':
         icon = feather.icons.x.toSvg();
         break;
@@ -28,7 +28,7 @@ export default class Toast {
     }
 
     let closeBtn = '';
-    if(duration > 0) {
+    if (duration > 0) {
       closeBtn = `
       <button type="button" class="ml-2 close" data-dismiss="toast" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -61,26 +61,26 @@ export default class Toast {
     </div>
     `;
 
-    if(Object.keys(data).length) {
+    if (Object.keys(data).length) {
       const tmp = document.createElement('div');
-      for(let key in data) {
+      for (let key in data) {
         tmp.innerHTML = key;
         key = tmp.textContent || tmp.innerText || '';
-  
+
         let value = data[key];
         tmp.innerHTML = value;
         value = tmp.textContent || tmp.innerText || '';
-  
-        if(typeof value === 'number') {
+
+        if (typeof value === 'number') {
           value = await Utils.formatMoney(value, 0);
-        } else if(key === 'type' || key === 'key') {
+        } else if (key === 'type' || key === 'key') {
           value = await Utils.capitalize(value);
         }
-  
-        if(key === 'Qty') {
+
+        if (key === 'Qty') {
           key = 'Quantity';
         }
-  
+
         message += `
         <div class="mb-2">
           <div class="strong">${await Utils.capitalize(key)}</div>
@@ -104,7 +104,7 @@ export default class Toast {
     if (res.status !== 200 && res.status !== 202) {
       this.showFailTx(res);
       return;
-    } else if(res.confirmed) {
+    } else if (res.confirmed) {
       this.showSuccessTx();
       return;
     }
@@ -120,7 +120,7 @@ export default class Toast {
 
   private async showFailTx(res: TransactionStatusResponse) {
     console.log(res);
-    
+
     this.showCloseBtn();
     this.t.find('.avatar').removeClass('bg-yellow').addClass('bg-red').html(feather.icons.x.toSvg());
   }

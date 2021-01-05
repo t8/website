@@ -17,12 +17,15 @@ export default class Statusify {
   private $elem: JQuery<HTMLElement>;
   private eventsStarted = false;
 
-  private statuses: Map<string, { 
-    title: string, 
-    status: statusType, 
-    $elem: JQuery<HTMLElement>,
-    deferred: Deferred
-  }> = new Map();
+  private statuses: Map<
+    string,
+    {
+      title: string;
+      status: statusType;
+      $elem: JQuery<HTMLElement>;
+      deferred: Deferred;
+    }
+  > = new Map();
 
   private updateMS: number = 0;
   private globalStatus: statusType = 'none';
@@ -40,7 +43,7 @@ export default class Statusify {
       <div class="spinner-border spinner-border-sm" role="status"></div>
     </span>`;
 
-    if(error) {
+    if (error) {
       stamp = `
       <span class="bg-red text-white stamp mr-3">
         ${feather.icons.x.toSvg()}
@@ -60,19 +63,19 @@ export default class Statusify {
     `);
 
     let deferred: Deferred;
-    if(!this.statuses.has(txid)) {
+    if (!this.statuses.has(txid)) {
       this.$elem.find('.card.card-sm').prepend($elem);
 
       deferred = new Deferred();
       this.statuses.set(txid, {
         title,
-        status: error? 'error' : 'pending',
+        status: error ? 'error' : 'pending',
         $elem,
-        deferred
+        deferred,
       });
 
-      if(this.globalStatus === 'none') {
-        if(error) {
+      if (this.globalStatus === 'none') {
+        if (error) {
           this.globalStatus = 'error';
           $('.status-bg').addClass('badge bg-red');
         } else {
@@ -83,12 +86,12 @@ export default class Statusify {
       }
     }
 
-    if(!this.eventsStarted) {
+    if (!this.eventsStarted) {
       this.eventsStarted = true;
       this.events();
     }
 
-    if(!deferred) {
+    if (!deferred) {
       return false;
     }
 
@@ -96,16 +99,16 @@ export default class Statusify {
   }
 
   private async update() {
-    if(!this.statuses.size) {
+    if (!this.statuses.size) {
       setTimeout(() => this.update(), this.updateMS);
       return;
     }
 
     let keys = Array.from(this.statuses.keys());
     const txids = [];
-    for(let i = 0; i < keys.length; i++) {
+    for (let i = 0; i < keys.length; i++) {
       const status = this.statuses.get(keys[i]);
-      if(status.status === 'pending') {
+      if (status.status === 'pending') {
         txids.push(keys[i]);
       }
     }
@@ -130,19 +133,19 @@ export default class Statusify {
             }
           }
         }
-      }`
+      }`,
     };
 
     const res = await arweave.api.post('/graphql', query);
     const data: GQLEdgeInterface[] = res.data.data.transactions.edges;
-    
+
     const foundTxs = [];
     let hasPending = false;
-    for(let i = 0, j = data.length; i < j; i++) {
+    for (let i = 0, j = data.length; i < j; i++) {
       const node = data[i].node;
       foundTxs.push(node.id);
 
-      if(!node.block) {
+      if (!node.block) {
         hasPending = true;
       } else {
         const status = this.statuses.get(node.id);
@@ -153,8 +156,8 @@ export default class Statusify {
     }
 
     let hasError = false;
-    for(let i = 0, j = txids.length; i < j; i++) {
-      if(!foundTxs.includes(txids[i])) {
+    for (let i = 0, j = txids.length; i < j; i++) {
+      if (!foundTxs.includes(txids[i])) {
         hasError = true;
 
         const status = this.statuses.get(txids[i]);
@@ -164,15 +167,15 @@ export default class Statusify {
       }
     }
 
-    if(this.globalStatus !== 'error') {
-      if(hasError) {
+    if (this.globalStatus !== 'error') {
+      if (hasError) {
         this.globalStatus = 'error';
         $('.status-bg').removeClass('bg-yellow bg-green').addClass('bg-red');
-      } else if(hasPending) {
+      } else if (hasPending) {
         this.globalStatus = 'pending';
         $('.status-bg').removeClass('bg-red bg-green').addClass('bg-yellow');
       } else {
-        $('.status-bg').removeClass('bg-yellow bg-red').addClass('bg-green')
+        $('.status-bg').removeClass('bg-yellow bg-red').addClass('bg-green');
       }
     }
 
@@ -180,22 +183,22 @@ export default class Statusify {
   }
 
   private events() {
-    this.$elem.on('click', '.dropdown-menu', e => {
+    this.$elem.on('click', '.dropdown-menu', (e) => {
       e.stopPropagation();
     });
 
     this.$elem.on('hidden.bs.dropdown', () => {
       // Remove all confirmed and error elements
       let keys = Array.from(this.statuses.keys());
-      for(let i = 0; i < keys.length; i++) {
+      for (let i = 0; i < keys.length; i++) {
         const status = this.statuses.get(keys[i]);
-        if(status.status !== 'pending') {
+        if (status.status !== 'pending') {
           status.$elem.remove();
           this.statuses.delete(keys[i]);
         }
       }
 
-      if(this.statuses.size) {
+      if (this.statuses.size) {
         this.globalStatus = 'pending';
         $('.status-bg').removeClass('bg-yellow').addClass('bg-yellow');
       } else {
